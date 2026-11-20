@@ -15,4 +15,6 @@ public interface TiketRepository extends JpaRepository<Tiket, Long> {
     List<Tiket> findByDodeljenIdOrderByDatumKreiranjaDesc(Long zaposleniId);
 
     List<Tiket> findByKreiraoIdOrderByDatumKreiranjaDesc(Long korisnikId);
+
+    List<Tiket> findByDodeljenId(Long zaposleniId);
 }

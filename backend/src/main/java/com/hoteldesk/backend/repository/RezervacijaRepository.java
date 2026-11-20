@@ -24,6 +24,8 @@ public interface RezervacijaRepository extends JpaRepository<Rezervacija, Long> 
 
     Optional<Rezervacija> findByIdAndGostId(Long id, Long gostId);
 
+    boolean existsByGostIdAndSobaHotelIdAndStatus(Long gostId, Long hotelId, StatusRezervacije status);
+
     @Query("""
             select count(r) > 0 from Rezervacija r
             where r.soba.id = :sobaId
