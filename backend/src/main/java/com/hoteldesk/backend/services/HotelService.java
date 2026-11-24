@@ -134,6 +134,7 @@ public class HotelService {
     }
 
     private HotelDTO toDto(Hotel hotel) {
-        return HotelDTO.from(hotel, recenzijaRepository.prosecnaOcena(hotel.getId()));
+        Double ocena = recenzijaRepository.prosecnaOcena(hotel.getId());
+        return HotelDTO.from(hotel, ocena == null ? null : Math.round(ocena * 10) / 10.0);
     }
 }
