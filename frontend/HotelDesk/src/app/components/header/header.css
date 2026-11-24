@@ -1,0 +1,71 @@
+.zaglavlje {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(42, 45, 52, 0.96);
+  backdrop-filter: blur(8px);
+  color: var(--main);
+}
+
+.red {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-znak {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px 10px 10px 2px;
+  background: var(--main);
+  color: var(--second);
+  font-family: var(--font-naslov);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.logo-tekst {
+  font-family: var(--font-naslov);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--main);
+}
+
+.logo-tekst em {
+  font-style: italic;
+  color: var(--accent-svetla);
+}
+
+.akcije {
+  display: flex;
+  gap: 10px;
+}
+
+.akcije .dugme {
+  padding: 9px 18px;
+  font-size: 14px;
+}
+
+.akcije .dugme-obrisano {
+  color: var(--main);
+  border-color: rgba(236, 235, 230, 0.35);
+}
+
+.akcije .dugme-obrisano:hover {
+  background: var(--second-svetla);
+}
+
+@media (max-width: 520px) {
+  .akcije .dugme-obrisano {
+    display: none;
+  }
+}

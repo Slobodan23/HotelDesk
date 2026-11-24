@@ -1,0 +1,29 @@
+<a class="kartica" [routerLink]="['/hoteli', hotel().id]" [queryParams]="upit()">
+  <div class="slika" [style.background]="pozadina()">
+    <span class="grad">{{ hotel().adresa.gradNaziv }}</span>
+    <span class="inicijal">{{ hotel().naziv.charAt(0) }}</span>
+  </div>
+  <div class="telo">
+    <div class="zvezdice" [attr.aria-label]="hotel().brojZvezdica + ' zvezdica'">
+      @for (z of zvezdice(); track $index) {
+        <span>★</span>
+      }
+    </div>
+    <h3>{{ hotel().naziv }}</h3>
+    <p class="adresa">
+      {{ hotel().adresa.ulica }} {{ hotel().adresa.broj }}, {{ hotel().adresa.gradNaziv }}
+    </p>
+    @if (hotel().opis) {
+      <p class="opis">{{ hotel().opis }}</p>
+    }
+    <div class="dno">
+      <div class="ocena">
+        @if (hotel().prosecnaOcena != null) {
+          <span class="broj">{{ hotel().prosecnaOcena }}</span>
+        }
+        <span class="opis-ocene">{{ opisOcene() }}</span>
+      </div>
+      <span class="vise">Pogledaj sobe →</span>
+    </div>
+  </div>
+</a>

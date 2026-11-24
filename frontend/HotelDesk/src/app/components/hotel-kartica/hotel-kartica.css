@@ -1,0 +1,125 @@
+:host {
+  display: block;
+}
+
+.kartica {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--main-svetla);
+  color: var(--second);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--senka);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kartica:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 4px rgba(42, 45, 52, 0.08), 0 16px 36px rgba(42, 45, 52, 0.16);
+}
+
+.slika {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+
+.inicijal {
+  position: absolute;
+  right: -6px;
+  bottom: -36px;
+  font-family: var(--font-naslov);
+  font-size: 150px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(236, 235, 230, 0.2);
+}
+
+.grad {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--main);
+  color: var(--second);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.telo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 18px 20px 20px;
+}
+
+.zvezdice {
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 2px;
+  height: 20px;
+}
+
+h3 {
+  font-size: 21px;
+  margin-top: 4px;
+}
+
+.adresa {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--tekst-blag);
+}
+
+.opis {
+  margin: 12px 0 0;
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--main-linija);
+}
+
+.telo > :nth-last-child(2) {
+  margin-bottom: 18px;
+}
+
+.ocena {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.broj {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--second);
+  color: var(--main);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.opis-ocene {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vise {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-tamna);
+}
