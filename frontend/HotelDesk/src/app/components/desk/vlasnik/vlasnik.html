@@ -1,0 +1,92 @@
+<section class="desk-sekcija" id="hoteli" aria-labelledby="hoteli-h">
+  <div class="desk-sekcija__glava">
+    <div>
+      <h2 id="hoteli-h">Moji hoteli</h2>
+      <p>Izaberi hotel da vidiš njegovo poslovanje i recenzije, ili dodaj novi.</p>
+    </div>
+  </div>
+  @if (greska()) {
+    <p class="desk-greska" role="alert">{{ greska() }}</p>
+  }
+  @if (uspeh()) {
+    <p class="vlasnik-uspeh" role="status">{{ uspeh() }}</p>
+  }
+  @if (ucitavanje()) {
+    <p class="desk-prazno">Učitavanje</p>
+  } @else {
+      <div class="hoteli">
+        @for (h of hoteli(); track h.id) {
+          <button type="button" class="hotel" [class.hotel--izabran]="izabran()?.id === h.id" [attr.aria-pressed]="izabran()?.id === h.id" [disabled]="carobnjak() != null" (click)="izaberi(h)">
+            <span class="hotel__zvezdice">{{ '★'.repeat(h.brojZvezdica ?? 0) }}</span>
+            <span class="hotel__naziv">{{ h.naziv }}</span>
+            <span class="hotel__mesto">{{ h.adresa.gradNaziv }}, {{ h.adresa.drzavaNaziv }}</span>
+            <span class="hotel__ocena">{{ h.prosecnaOcena != null ? h.prosecnaOcena + ' od 10' : 'Bez ocena' }}</span>
+          </button>
+        }
+        <button type="button" class="hotel hotel--novi" [class.hotel--izabran]="carobnjak()?.korak === 'hotel'" (click)="otvoriNoviHotel()">
+          <span class="hotel__plus" aria-hidden="true">+</span>
+          <span class="hotel__naziv">Novi hotel</span>
+          <span class="hotel__mesto">Hotel, spratovi i sobe, menadžer</span>
+        </button>
+      </div>
+    }
+  </section>
+
+  @if (carobnjak(); as c) {
+    <app-novi-hotel
+      [pocetniKorak]="c.korak"
+      [postojeciHotel]="c.hotel"
+      (hotelNapravljen)="hotelNapravljen($event)"
+      (menadzerNapravljen)="menadzerNapravljen($event)"
+      (zatvori)="zatvoriCarobnjak()" />
+  } @else {
+  @if (izabran(); as h) {
+    <section class="desk-sekcija" id="poslovanje" aria-labelledby="poslovanje-h">
+      <div class="desk-sekcija__glava">
+        <div><h2 id="poslovanje-h">{{ h.naziv }}</h2><p>Prihod se računa od odjavljenih boravaka u poslednjih 30 dana.</p></div>
+        @if (!ucitavanjeHotela()) {
+          <div class="vlasnik-menadzer">
+            @if (menadzeri().length) {
+              <span>Menadžer: {{ menadzeri()[0].ime }} {{ menadzeri()[0].prezime }}</span>
+            } @else {
+              <span class="vlasnik-menadzer__nema">Hotel nema menadžera</span>
+              <button type="button" class="desk-dugme desk-dugme--glavno" (click)="dodajMenadzera(h)">Dodaj menadžera</button>
+            }
+          </div>
+        }
+      </div>
+      <div class="desk-brojke">
+        <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ ucitavanjeHotela() ? '·' : brojke().uHotelu }}</span><span class="desk-brojka__opis">gostiju je sada u hotelu</span></div>
+        <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ ucitavanjeHotela() ? '·' : brojke().predstoji }}</span><span class="desk-brojka__opis">predstojećih rezervacija</span></div>
+        <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ ucitavanjeHotela() ? '·' : brojke().prihod + ' €' }}</span><span class="desk-brojka__opis">prihod za 30 dana</span></div>
+        <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ ucitavanjeHotela() ? '·' : brojke().otkazano }}</span><span class="desk-brojka__opis">otkazanih ukupno</span></div>
+      </div>
+    </section>
+
+    <section class="desk-sekcija" id="recenzije" aria-labelledby="recenzije-h">
+      <div class="desk-sekcija__glava"><h2 id="recenzije-h">Recenzije</h2><p>Najnovije prve.</p></div>
+      <div class="desk-panel">
+        @if (ucitavanjeHotela()) {
+          <p class="desk-prazno">Učitavanje</p>
+        } @else if (poslednjeRecenzije().length === 0) {
+          <p class="desk-prazno">Hotel još nema recenzija.</p>
+        } @else {
+          <table class="desk-tabela">
+            <thead><tr><th>Ocena</th><th>Gost</th><th>Recenzija</th><th>Datum</th></tr></thead>
+            <tbody>
+              @for (r of sRecenzije.prikazani(); track r.id) {
+                <tr>
+                  <td><span class="desk-oznaka desk-oznaka--tamna">{{ r.ocena }}</span></td>
+                  <td>{{ r.gostImePrezime }}</td>
+                  <td>{{ r.tekstRecenzije }}</td>
+                  <td>{{ r.datum?.slice(0, 10) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+      <app-strane [s]="sRecenzije" />
+    </section>
+  }
+}

@@ -1,0 +1,99 @@
+<section class="desk-sekcija" id="pregled" aria-labelledby="pregled-h">
+  <div class="desk-sekcija__glava">
+    <div>
+      <h2 id="pregled-h">Pregled hotela</h2>
+      <p>Stanje soba i tiketi koji čekaju zaposlenog.</p>
+    </div>
+  </div>
+  @if (greska()) {
+    <p class="desk-greska" role="alert">{{ greska() }}</p>
+  }
+  <div class="desk-brojke">
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().sobe }}</span><span class="desk-brojka__opis">soba ukupno</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().cistih }}</span><span class="desk-brojka__opis">čistih</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().prljavih }}</span><span class="desk-brojka__opis">za čišćenje</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().odrzavanje }}</span><span class="desk-brojka__opis">u održavanju</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().nedodeljenih }}</span><span class="desk-brojka__opis">tiketa bez zaposlenog</span></div>
+  </div>
+</section>
+
+<section class="desk-sekcija" id="tiketi" aria-labelledby="tiketi-h">
+  <div class="desk-sekcija__glava"><h2 id="tiketi-h">Otvoreni tiketi</h2><p>Izaberi zaposlenog i tiket mu se odmah pojavi na listi.</p></div>
+  <div class="desk-panel">
+    @if (ucitavanje()) {
+      <p class="desk-prazno">Učitavanje</p>
+    } @else if (otvoreniTiketi().length === 0) {
+      <p class="desk-prazno">Nema otvorenih tiketa.</p>
+    } @else {
+      <table class="desk-tabela">
+        <thead><tr><th>Soba</th><th>Vrsta</th><th>Opis</th><th>Status</th><th>Zaposleni</th></tr></thead>
+        <tbody>
+          @for (t of sTiketi.prikazani(); track t.id) {
+            <tr>
+              <td>{{ t.brojSobe ?? 'Hotel' }}</td>
+              <td>{{ tipTiketa[t.tipTiketa] }}</td>
+              <td>{{ t.sadrzaj }}<span class="desk-tabela__sporedno">{{ t.kreiraoImePrezime }}</span></td>
+              <td><span class="desk-oznaka" [class.desk-oznaka--plava]="t.status === 'U_TOKU'">{{ t.status ? statusTiketa[t.status] : '' }}</span></td>
+              <td>
+                <select class="desk-izbor" [attr.aria-label]="'Zaposleni za tiket ' + (t.brojSobe ?? '')" [disabled]="radi() === t.id"
+                  (change)="dodeli(t, $any($event.target).value)">
+                  <option value="" [selected]="t.dodeljenId == null">Nije dodeljen</option>
+                  @for (z of zaposleni(); track z.id) {
+                    <option [value]="z.id" [selected]="z.id === t.dodeljenId">{{ z.ime }} {{ z.prezime }} · {{ tipZaposlenog[z.tipZaposlenog] }}</option>
+                  }
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sTiketi" />
+</section>
+
+<section class="desk-sekcija" id="sobe" aria-labelledby="sobe-h">
+  <div class="desk-sekcija__glava"><h2 id="sobe-h">Sobe</h2></div>
+  <div class="desk-panel">
+    @if (!ucitavanje()) {
+      <table class="desk-tabela">
+        <thead><tr><th>Soba</th><th>Sprat</th><th>Tip</th><th>Gosti</th><th>Cena po noći</th><th>Status</th></tr></thead>
+        <tbody>
+          @for (s of sSobe.prikazani(); track s.id) {
+            <tr>
+              <td>{{ s.brojSobe }}</td>
+              <td>{{ s.sprat }}</td>
+              <td>{{ s.tipSobe }}</td>
+              <td>{{ s.maxGostiju }}</td>
+              <td>{{ s.cenaPoNoci }} €</td>
+              <td><span class="desk-oznaka" [class.desk-oznaka--plava]="s.status === 'PRLJAVA'" [class.desk-oznaka--tamna]="s.status === 'U_ODRZAVANJU'">{{ s.status ? statusSobe[s.status] : '' }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sSobe" />
+</section>
+
+<section class="desk-sekcija" id="zaposleni" aria-labelledby="zaposleni-h">
+  <div class="desk-sekcija__glava"><h2 id="zaposleni-h">Zaposleni</h2></div>
+  <div class="desk-panel">
+    @if (!ucitavanje()) {
+      <table class="desk-tabela">
+        <thead><tr><th>Ime i prezime</th><th>Posao</th><th>Email</th><th>Telefon</th></tr></thead>
+        <tbody>
+          @for (z of sZaposleni.prikazani(); track z.id) {
+            <tr>
+              <td>{{ z.ime }} {{ z.prezime }}</td>
+              <td>{{ tipZaposlenog[z.tipZaposlenog] }}</td>
+              <td>{{ z.email }}</td>
+              <td>{{ z.brojTelefona }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sZaposleni" />
+</section>

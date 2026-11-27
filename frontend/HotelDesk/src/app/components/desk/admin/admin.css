@@ -1,0 +1,106 @@
+.admin-forma {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--s-4);
+  margin-bottom: var(--s-5);
+  padding: var(--s-5);
+}
+
+.admin-polje {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  font-size: var(--t-small);
+  font-weight: 500;
+}
+
+.admin-polje input,
+.admin-polje select {
+  height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid rgba(42, 45, 52, 0.2);
+  border-radius: var(--r-sm);
+  background: #fff;
+  color: var(--p-ink);
+  font: 400 15px/1 var(--font-text);
+}
+
+.admin-polje [aria-invalid='true'] {
+  border: 2px solid color-mix(in oklab, #d92d20 72%, var(--p-ink));
+}
+
+.admin-polje__greska {
+  font-weight: 400;
+  color: color-mix(in oklab, #d92d20 75%, var(--p-ink));
+}
+
+.admin-forma__dno {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+
+.admin-forma__dno .desk-greska {
+  margin: 0;
+}
+
+.admin-uspeh {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-sm);
+  background: color-mix(in oklab, var(--p-accent) 12%, #fff);
+  font-size: var(--t-small);
+}
+
+.admin-filteri {
+  margin-bottom: var(--s-4);
+}
+
+.admin-uredi td {
+  background: var(--p-bg);
+}
+
+
+
+.admin-forma__naslov {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.admin-forma__dugmad {
+  display: flex;
+  gap: var(--s-3);
+}
+
+.admin-red--izabran td {
+  background: color-mix(in oklab, var(--p-accent) 8%, #fff);
+}
+
+.desk-tabela__akcija .desk-dugme + .desk-dugme {
+  margin-left: var(--s-2);
+}
+
+.admin-potvrda {
+  margin-right: var(--s-3);
+  font-size: var(--t-small);
+  font-weight: 500;
+}
+
+.admin-dugme--brisi {
+  border-color: color-mix(in oklab, #d92d20 72%, var(--p-ink));
+  background: color-mix(in oklab, #d92d20 72%, var(--p-ink));
+  color: #fff;
+}
+
+.admin-dugme--brisi:hover {
+  background: color-mix(in oklab, #d92d20 60%, #000);
+}
+
+.admin-uredi__greska {
+  margin: 0;
+}

@@ -1,0 +1,87 @@
+<section class="desk-sekcija" id="pregled" aria-labelledby="pregled-h">
+  <div class="desk-sekcija__glava">
+    <div>
+      <h2 id="pregled-h">Recepcija za dan</h2>
+      <p>Dolasci i odlasci gostiju za izabrani datum.</p>
+    </div>
+    <label class="desk-polje">
+      Datum
+      <input type="date" [value]="datum()" (change)="promeniDatum($any($event.target).value)">
+    </label>
+  </div>
+  @if (greska()) {
+    <p class="desk-greska" role="alert">{{ greska() }}</p>
+  }
+  <div class="desk-brojke">
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().dolazaka }}</span><span class="desk-brojka__opis">dolazaka</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().prijavljeno }}</span><span class="desk-brojka__opis">već prijavljeno</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().odlazaka }}</span><span class="desk-brojka__opis">odlazaka</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().odjavljeno }}</span><span class="desk-brojka__opis">već odjavljeno</span></div>
+  </div>
+</section>
+
+<section class="desk-sekcija" id="dolasci" aria-labelledby="dolasci-h">
+  <div class="desk-sekcija__glava"><h2 id="dolasci-h">Dolasci</h2></div>
+  <div class="desk-panel">
+    @if (ucitavanje()) {
+      <p class="desk-prazno">Učitavanje</p>
+    } @else if (dolasci().length === 0) {
+      <p class="desk-prazno">Nema dolazaka za ovaj dan.</p>
+    } @else {
+      <table class="desk-tabela">
+        <thead><tr><th>Gost</th><th>Soba</th><th>Boravak</th><th>Plaćanje</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (r of sDolasci.prikazani(); track r.id) {
+            <tr>
+              <td>{{ r.gostImePrezime }}<span class="desk-tabela__sporedno">{{ r.brojGostiju }} {{ r.brojGostiju === 1 ? 'gost' : 'gosta' }}</span></td>
+              <td>{{ r.brojSobe }}</td>
+              <td>{{ brojNoci(r.datumDolaska, r.datumOdlaska) }} noći<span class="desk-tabela__sporedno">do {{ r.datumOdlaska }}</span></td>
+              <td>{{ r.placanje?.nacinPlacanja === 'KARTICA' ? 'Kartica' : 'Gotovina' }}<span class="desk-tabela__sporedno">{{ r.ukupnaCena }} €</span></td>
+              <td><span class="desk-oznaka" [class.desk-oznaka--plava]="r.status === 'PRIJAVLJEN'">{{ r.status ? status[r.status] : '' }}</span></td>
+              <td class="desk-tabela__akcija">
+                @if (akcijaDolaska(r); as a) {
+                  <button type="button" class="desk-dugme" [class.desk-dugme--glavno]="a.glavna" [disabled]="radi() === r.id" (click)="izvrsi(r, a)">{{ a.naziv }}</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sDolasci" />
+</section>
+
+<section class="desk-sekcija" id="odlasci" aria-labelledby="odlasci-h">
+  <div class="desk-sekcija__glava"><h2 id="odlasci-h">Odlasci</h2><p>Odjava zatvara račun i šalje sobu na čišćenje.</p></div>
+  <div class="desk-panel">
+    @if (ucitavanje()) {
+      <p class="desk-prazno">Učitavanje</p>
+    } @else if (odlasci().length === 0) {
+      <p class="desk-prazno">Nema odlazaka za ovaj dan.</p>
+    } @else {
+      <table class="desk-tabela">
+        <thead><tr><th>Gost</th><th>Soba</th><th>Za naplatu</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (r of sOdlasci.prikazani(); track r.id) {
+            <tr>
+              <td>{{ r.gostImePrezime }}</td>
+              <td>{{ r.brojSobe }}</td>
+              <td>
+                {{ r.ukupnaCena }} €
+                <span class="desk-tabela__sporedno">{{ r.placanje?.placeno ? 'Plaćeno' : (r.placanje?.nacinPlacanja === 'KARTICA' ? 'Kartica' : 'Gotovina na recepciji') }}</span>
+              </td>
+              <td><span class="desk-oznaka" [class.desk-oznaka--tamna]="r.status === 'ODJAVLJEN'">{{ r.status ? status[r.status] : '' }}</span></td>
+              <td class="desk-tabela__akcija">
+                @if (akcijaOdlaska(r); as a) {
+                  <button type="button" class="desk-dugme desk-dugme--glavno" [disabled]="radi() === r.id" (click)="izvrsi(r, a)">{{ a.naziv }}</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sOdlasci" />
+</section>

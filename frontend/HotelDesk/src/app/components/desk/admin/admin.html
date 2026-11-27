@@ -1,0 +1,201 @@
+<section class="desk-sekcija" id="pregled" aria-labelledby="pregled-h">
+  <div class="desk-sekcija__glava">
+    <div>
+      <h2 id="pregled-h">Korisnici sistema</h2>
+      <p>Broj naloga po ulozi.</p>
+    </div>
+  </div>
+  @if (greska()) {
+    <p class="desk-greska" role="alert">{{ greska() }}</p>
+  }
+  <div class="desk-brojke">
+    @for (u of uloge; track u) {
+      <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ poUlozi()[u] }}</span><span class="desk-brojka__opis">{{ uloga[u] }}</span></div>
+    }
+  </div>
+</section>
+
+<section class="desk-sekcija" id="korisnici" aria-labelledby="korisnici-h">
+  <div class="desk-sekcija__glava">
+    <div>
+      <h2 id="korisnici-h">Nalozi</h2>
+      <p>Pravi naloge sa bilo kojom ulogom, menjaj im podatke i uloge ili ih obriši.</p>
+    </div>
+    <button type="button" class="desk-dugme desk-dugme--glavno" [attr.aria-expanded]="noviOtvoren()" aria-controls="novi-korisnik" (click)="otvoriNovi()">
+      {{ noviOtvoren() && izmenaId() == null ? 'Zatvori formu' : 'Novi korisnik' }}
+    </button>
+  </div>
+
+  @if (uspeh()) {
+    <p class="admin-uspeh" role="status">{{ uspeh() }}</p>
+  }
+
+  @if (noviOtvoren()) {
+    <form class="desk-panel admin-forma" id="novi-korisnik" [formGroup]="novi" (ngSubmit)="sacuvajNovi()" novalidate>
+      <p class="admin-forma__naslov">{{ izmenaId() == null ? 'Novi korisnik' : 'Izmena: ' + novi.controls.ime.value + ' ' + novi.controls.prezime.value }}</p>
+      <div class="admin-polje">
+        <label for="n-ime">Ime</label>
+        <input id="n-ime" formControlName="ime" autocomplete="off" [attr.aria-invalid]="neispravnoNovo('ime')">
+        @if (neispravnoNovo('ime')) { <span class="admin-polje__greska">Upiši ime.</span> }
+      </div>
+      <div class="admin-polje">
+        <label for="n-prezime">Prezime</label>
+        <input id="n-prezime" formControlName="prezime" autocomplete="off" [attr.aria-invalid]="neispravnoNovo('prezime')">
+        @if (neispravnoNovo('prezime')) { <span class="admin-polje__greska">Upiši prezime.</span> }
+      </div>
+      <div class="admin-polje">
+        <label for="n-email">Email</label>
+        <input id="n-email" type="email" formControlName="email" autocomplete="off" [attr.aria-invalid]="neispravnoNovo('email')">
+        @if (neispravnoNovo('email')) { <span class="admin-polje__greska">Upiši email adresu sa &#64;.</span> }
+      </div>
+      <div class="admin-polje">
+        <label for="n-lozinka">{{ izmenaId() == null ? 'Početna lozinka' : 'Nova lozinka (prazno ako se ne menja)' }}</label>
+        <input id="n-lozinka" type="text" formControlName="password" autocomplete="off" [attr.aria-invalid]="neispravnoNovo('password')">
+        @if (neispravnoNovo('password')) { <span class="admin-polje__greska">Najmanje 8 znakova.</span> }
+      </div>
+      <div class="admin-polje">
+        <label for="n-telefon">Telefon (nije obavezno)</label>
+        <input id="n-telefon" type="tel" formControlName="brojTelefona" autocomplete="off">
+      </div>
+      <div class="admin-polje">
+        <label for="n-pol">Pol (nije obavezno)</label>
+        <select id="n-pol" formControlName="pol">
+          <option value="">Nije navedeno</option>
+          <option value="ZENSKI">Ženski</option>
+          <option value="MUSKI">Muški</option>
+        </select>
+      </div>
+      <div class="admin-polje">
+        <label for="n-uloga">Uloga</label>
+        <select id="n-uloga" formControlName="uloga">
+          @for (u of uloge; track u) {
+            <option [value]="u">{{ uloga[u] }}</option>
+          }
+        </select>
+      </div>
+      @if (novaUloga() === 'ZAPOSLENI') {
+        <div class="admin-polje">
+          <label for="n-posao">Posao</label>
+          <select id="n-posao" formControlName="tipZaposlenog" [attr.aria-invalid]="neispravnoNovo('tipZaposlenog')">
+            <option value="">Izaberi posao</option>
+            @for (p of poslovi; track p) {
+              <option [value]="p">{{ tipZaposlenog[p] }}</option>
+            }
+          </select>
+          @if (neispravnoNovo('tipZaposlenog')) { <span class="admin-polje__greska">Izaberi posao.</span> }
+        </div>
+        <div class="admin-polje">
+          <label for="n-hotel">Hotel</label>
+          <select id="n-hotel" formControlName="hotelId" [attr.aria-invalid]="neispravnoNovo('hotelId')">
+            <option value="">Izaberi hotel</option>
+            @for (h of hoteli(); track h.id) {
+              <option [value]="h.id">{{ h.naziv }}, {{ h.adresa.gradNaziv }}</option>
+            }
+          </select>
+          @if (neispravnoNovo('hotelId')) { <span class="admin-polje__greska">Izaberi hotel.</span> }
+        </div>
+      }
+      <div class="admin-forma__dno">
+        @if (greskaNovog()) {
+          <p class="desk-greska" role="alert">{{ greskaNovog() }}</p>
+        }
+        <div class="admin-forma__dugmad">
+          <button type="submit" class="desk-dugme desk-dugme--glavno" [disabled]="cuvaNovi()">{{ cuvaNovi() ? 'Čuvanje' : (izmenaId() == null ? 'Napravi nalog' : 'Sačuvaj izmene') }}</button>
+          <button type="button" class="desk-dugme" (click)="zatvoriFormu()">Otkaži</button>
+        </div>
+      </div>
+    </form>
+  }
+
+  <div class="desk-filteri admin-filteri">
+    <label class="desk-polje">
+      Uloga
+      <select (change)="promeniFilter($any($event.target).value)">
+        <option value="">Sve</option>
+        @for (u of uloge; track u) {
+          <option [value]="u">{{ uloga[u] }}</option>
+        }
+      </select>
+    </label>
+    <label class="desk-polje">
+      Pretraga
+      <input type="search" (input)="promeniPretragu($any($event.target).value)">
+    </label>
+  </div>
+
+  <div class="desk-panel">
+    @if (ucitavanje()) {
+      <p class="desk-prazno">Učitavanje</p>
+    } @else if (filtrirani().length === 0) {
+      <p class="desk-prazno">Nema naloga za ovaj filter.</p>
+    } @else {
+      <table class="desk-tabela">
+        <thead><tr><th>Ime i prezime</th><th>Email</th><th>Uloga</th><th>Telefon</th><th></th></tr></thead>
+        <tbody>
+          @for (k of sKorisnici.prikazani(); track k.id) {
+            <tr [class.admin-red--izabran]="izmenaId() === k.id">
+              <td>{{ k.ime }} {{ k.prezime }}</td>
+              <td>{{ k.email }}</td>
+              <td>
+                <span class="desk-oznaka" [class.desk-oznaka--tamna]="k.uloga === 'ADMIN'" [class.desk-oznaka--plava]="k.uloga === 'VLASNIK'">
+                  {{ k.tipZaposlenog ? tipZaposlenog[k.tipZaposlenog] : (k.uloga ? uloga[k.uloga] : '') }}
+                </span>
+              </td>
+              <td>{{ k.brojTelefona }}</td>
+              <td class="desk-tabela__akcija">
+                @if (brisanjeId() === k.id) {
+                  <span class="admin-potvrda">Obrisati nalog?</span>
+                  <button type="button" class="desk-dugme admin-dugme--brisi" [disabled]="brise()" (click)="obrisi(k)">Da, obriši</button>
+                  <button type="button" class="desk-dugme" (click)="brisanjeId.set(null)">Ne</button>
+                } @else {
+                  <button type="button" class="desk-dugme" (click)="izmeni(k)">Izmeni</button>
+                  @if (!jaSam(k)) {
+                    <button type="button" class="desk-dugme" (click)="pitajZaBrisanje(k)">Obriši</button>
+                  }
+                }
+              </td>
+            </tr>
+            @if (brisanjeId() === k.id && greskaBrisanja()) {
+              <tr class="admin-uredi"><td colspan="5"><p class="desk-greska admin-uredi__greska" role="alert">{{ greskaBrisanja() }}</p></td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sKorisnici" />
+</section>
+
+<section class="desk-sekcija" id="gradovi" aria-labelledby="gradovi-h">
+  <div class="desk-sekcija__glava"><h2 id="gradovi-h">Gradovi</h2></div>
+  <div class="desk-panel">
+    @if (!ucitavanje()) {
+      <table class="desk-tabela">
+        <thead><tr><th>Grad</th><th>Poštanski broj</th><th>Država</th></tr></thead>
+        <tbody>
+          @for (g of sGradovi.prikazani(); track g.id) {
+            <tr><td>{{ g.naziv }}</td><td>{{ g.postanskiBroj }}</td><td>{{ g.drzavaNaziv }}</td></tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sGradovi" />
+</section>
+
+<section class="desk-sekcija" id="tipovi" aria-labelledby="tipovi-h">
+  <div class="desk-sekcija__glava"><h2 id="tipovi-h">Tipovi soba</h2></div>
+  <div class="desk-panel">
+    @if (!ucitavanje()) {
+      <table class="desk-tabela">
+        <thead><tr><th>Tip</th><th>Najviše gostiju</th><th>Opis</th></tr></thead>
+        <tbody>
+          @for (t of sTipovi.prikazani(); track t.id) {
+            <tr><td>{{ t.tip }}</td><td>{{ t.maxGostiju }}</td><td>{{ t.opis }}</td></tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sTipovi" />
+</section>

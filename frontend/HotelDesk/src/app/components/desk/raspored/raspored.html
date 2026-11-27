@@ -1,0 +1,42 @@
+<div class="desk">
+  <aside class="desk-meni" aria-label="Meni">
+    <a class="desk-logo" routerLink="/"><span class="desk-logo__znak" aria-hidden="true">H</span>HotelDesk</a>
+    <p class="desk-meni__naslov">{{ podaci().naslov }}</p>
+    @if (hotel(); as h) {
+      <p class="desk-meni__hotel">{{ h.naziv }}</p>
+    }
+    <nav class="desk-meni__linkovi">
+      @for (s of podaci().sekcije; track s.id) {
+        <a [href]="'#' + s.id" (click)="idiNa(s.id, $event)">{{ s.naziv }}</a>
+      }
+    </nav>
+    <a class="desk-meni__sajt" routerLink="/">Sajt za goste</a>
+  </aside>
+
+  <div class="desk-glavni">
+    <header class="desk-traka">
+      <div>
+        <p class="desk-traka__naslov">{{ podaci().naslov }}</p>
+        @if (hotel(); as h) {
+          <p class="desk-traka__hotel">{{ h.naziv }}, {{ h.adresa.gradNaziv }}</p>
+        }
+      </div>
+      @if (auth.korisnik(); as k) {
+        <div class="desk-profil">
+          <button type="button" class="desk-profil__dugme" (click)="meniOtvoren.set(!meniOtvoren())"
+            [attr.aria-expanded]="meniOtvoren()" aria-controls="desk-profil-meni" [attr.aria-label]="'Nalog: ' + k.ime + ' ' + k.prezime">{{ inicijali() }}</button>
+          @if (meniOtvoren()) {
+            <div class="desk-profil__meni" id="desk-profil-meni">
+              <p class="desk-profil__ime">{{ k.ime }} {{ k.prezime }}</p>
+              <p class="desk-profil__opis">{{ opisUloge() }} · {{ k.email }}</p>
+              <button type="button" class="desk-dugme desk-dugme--siroko" (click)="odjavi()">Odjava</button>
+            </div>
+          }
+        </div>
+      }
+    </header>
+    <main class="desk-sadrzaj" id="top">
+      <router-outlet />
+    </main>
+  </div>
+</div>

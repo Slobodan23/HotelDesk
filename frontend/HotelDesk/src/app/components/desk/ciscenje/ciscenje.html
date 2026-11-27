@@ -1,0 +1,78 @@
+<section class="desk-sekcija" id="pregled" aria-labelledby="pregled-h">
+  <div class="desk-sekcija__glava">
+    <div>
+      <h2 id="pregled-h">Stanje soba</h2>
+      <p>Sobe se posle odjave gosta same označe za čišćenje.</p>
+    </div>
+  </div>
+  @if (greska()) {
+    <p class="desk-greska" role="alert">{{ greska() }}</p>
+  }
+  <div class="desk-brojke">
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().prljavih }}</span><span class="desk-brojka__opis">za čišćenje</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().cistih }}</span><span class="desk-brojka__opis">čistih soba</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().odrzavanje }}</span><span class="desk-brojka__opis">u održavanju</span></div>
+    <div class="desk-brojka"><span class="desk-brojka__vrednost">{{ brojke().tiketa }}</span><span class="desk-brojka__opis">mojih otvorenih tiketa</span></div>
+  </div>
+</section>
+
+<section class="desk-sekcija" id="sobe" aria-labelledby="sobe-h">
+  <div class="desk-sekcija__glava"><h2 id="sobe-h">Sobe za čišćenje</h2></div>
+  <div class="desk-panel">
+    @if (ucitavanje()) {
+      <p class="desk-prazno">Učitavanje</p>
+    } @else if (zaCiscenje().length === 0) {
+      <p class="desk-prazno">Sve sobe su čiste.</p>
+    } @else {
+      <table class="desk-tabela">
+        <thead><tr><th>Soba</th><th>Sprat</th><th>Tip</th><th></th></tr></thead>
+        <tbody>
+          @for (s of sSobe.prikazani(); track s.id) {
+            <tr>
+              <td>{{ s.brojSobe }}</td>
+              <td>{{ s.sprat }}</td>
+              <td>{{ s.tipSobe }}</td>
+              <td class="desk-tabela__akcija">
+                <button type="button" class="desk-dugme desk-dugme--glavno" [disabled]="radi() === 's' + s.id" (click)="ocisti(s)">Soba je čista</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sSobe" />
+</section>
+
+<section class="desk-sekcija" id="tiketi" aria-labelledby="tiketi-h">
+  <div class="desk-sekcija__glava"><h2 id="tiketi-h">Moji tiketi</h2><p>Zatvaranje tiketa za čišćenje označava sobu kao čistu.</p></div>
+  <div class="desk-panel">
+    @if (ucitavanje()) {
+      <p class="desk-prazno">Učitavanje</p>
+    } @else if (otvoreniTiketi().length === 0) {
+      <p class="desk-prazno">Nemaš otvorenih tiketa.</p>
+    } @else {
+      <table class="desk-tabela">
+        <thead><tr><th>Soba</th><th>Vrsta</th><th>Opis</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (t of sTiketi.prikazani(); track t.id) {
+            <tr>
+              <td>{{ t.brojSobe ?? 'Hotel' }}</td>
+              <td>{{ tipTiketa[t.tipTiketa] }}</td>
+              <td>{{ t.sadrzaj }}<span class="desk-tabela__sporedno">{{ t.kreiraoImePrezime }}</span></td>
+              <td><span class="desk-oznaka" [class.desk-oznaka--plava]="t.status === 'U_TOKU'">{{ t.status ? statusTiketa[t.status] : '' }}</span></td>
+              <td class="desk-tabela__akcija">
+                @if (t.status === 'OTVOREN') {
+                  <button type="button" class="desk-dugme" [disabled]="radi() === 't' + t.id" (click)="promeniTiket(t, 'U_TOKU')">Počni</button>
+                } @else {
+                  <button type="button" class="desk-dugme desk-dugme--glavno" [disabled]="radi() === 't' + t.id" (click)="promeniTiket(t, 'ZATVOREN')">Završi</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+  <app-strane [s]="sTiketi" />
+</section>

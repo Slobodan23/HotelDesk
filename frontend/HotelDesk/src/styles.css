@@ -4,3 +4,212 @@ app-footer,
 app-pocetna {
   display: contents;
 }
+
+app-desk-raspored {
+  display: block;
+}
+
+.desk-sekcija {
+  scroll-margin-top: 96px;
+}
+
+.desk-sekcija + .desk-sekcija {
+  margin-top: var(--s-8);
+}
+
+.desk-sekcija__glava {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-bottom: var(--s-5);
+}
+
+.desk-sekcija__glava h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.desk-sekcija__glava p {
+  margin: var(--s-1) 0 0;
+  color: var(--p-muted);
+}
+
+.desk-brojke {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--s-4);
+}
+
+.desk-brojka {
+  padding: var(--s-5);
+  border: 1px solid rgba(42, 45, 52, 0.12);
+  border-radius: var(--r-md);
+  background: #fff;
+}
+
+.desk-brojka__vrednost {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.desk-brojka__opis {
+  display: block;
+  margin-top: var(--s-1);
+  font-size: var(--t-small);
+  color: var(--p-muted);
+}
+
+.desk-panel {
+  border: 1px solid rgba(42, 45, 52, 0.12);
+  border-radius: var(--r-md);
+  background: #fff;
+  overflow-x: auto;
+}
+
+.desk-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.desk-tabela th {
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid rgba(42, 45, 52, 0.12);
+  font-size: var(--t-label);
+  font-weight: 500;
+  color: var(--p-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.desk-tabela td {
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid rgba(42, 45, 52, 0.08);
+  vertical-align: middle;
+}
+
+.desk-tabela tr:last-child td {
+  border-bottom: 0;
+}
+
+.desk-tabela__akcija {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.desk-tabela__sporedno {
+  display: block;
+  font-size: var(--t-small);
+  color: var(--p-muted);
+}
+
+.desk-oznaka {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--p-surface);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.desk-oznaka--plava {
+  background: color-mix(in oklab, var(--p-accent) 14%, #fff);
+  color: color-mix(in oklab, var(--p-accent) 80%, var(--p-ink));
+}
+
+.desk-oznaka--tamna {
+  background: var(--p-ink);
+  color: var(--p-bg);
+}
+
+.desk-dugme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 var(--s-4);
+  border: 1px solid rgba(42, 45, 52, 0.2);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--p-ink);
+  font: 500 14px/1 var(--font-text);
+  cursor: pointer;
+}
+
+.desk-dugme:hover {
+  background: var(--p-surface);
+}
+
+.desk-dugme:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.desk-dugme--glavno {
+  border-color: var(--p-action);
+  background: var(--p-action);
+  color: var(--p-action-ink);
+}
+
+.desk-dugme--glavno:hover {
+  background: color-mix(in oklab, var(--p-action) 85%, #000);
+}
+
+.desk-dugme--siroko {
+  width: 100%;
+}
+
+.desk-polje {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--t-small);
+  color: var(--p-muted);
+}
+
+.desk-polje input,
+.desk-polje select,
+.desk-izbor {
+  height: 40px;
+  padding: 0 var(--s-3);
+  border: 1px solid rgba(42, 45, 52, 0.2);
+  border-radius: var(--r-sm);
+  background: #fff;
+  color: var(--p-ink);
+  font: 400 15px/1 var(--font-text);
+}
+
+.desk-prazno {
+  margin: 0;
+  padding: var(--s-6);
+  color: var(--p-muted);
+  text-align: center;
+}
+
+.desk-greska {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-sm);
+  background: color-mix(in oklab, #d92d20 10%, #fff);
+  color: color-mix(in oklab, #d92d20 75%, var(--p-ink));
+  font-size: var(--t-small);
+}
+
+.desk-filteri,
+.desk-strane {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.desk-strane {
+  justify-content: flex-end;
+  margin-top: var(--s-3);
+}

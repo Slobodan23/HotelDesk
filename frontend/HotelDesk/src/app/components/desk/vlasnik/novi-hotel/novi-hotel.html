@@ -1,0 +1,217 @@
+<section class="desk-sekcija" id="forma-vlasnika" aria-labelledby="forma-h">
+  <div class="desk-sekcija__glava">
+    <div>
+      <h2 id="forma-h">
+        @switch (korak()) {
+          @case ('hotel') { Novi hotel }
+          @case ('sobe') { Sobe za {{ hotel()?.naziv }} }
+          @case ('menadzer') { Menadžer za {{ hotel()?.naziv }} }
+        }
+      </h2>
+      @if (pocetniKorak() === 'hotel') {
+        <ol class="koraci">
+          <li [class.koraci--aktivan]="korak() === 'hotel'">Hotel</li>
+          <li [class.koraci--aktivan]="korak() === 'sobe'">Spratovi i sobe</li>
+          <li [class.koraci--aktivan]="korak() === 'menadzer'">Menadžer</li>
+        </ol>
+      }
+    </div>
+  </div>
+
+  @if (korak() === 'hotel') {
+    <form class="desk-panel nh-forma" [formGroup]="hotelForma" (ngSubmit)="sacuvajHotel()" novalidate>
+      <div class="nh-polje nh-polje--siroko">
+        <label for="h-naziv">Naziv hotela</label>
+        <input id="h-naziv" formControlName="naziv" [attr.aria-invalid]="neispravno('hotel', 'naziv')">
+        @if (neispravno('hotel', 'naziv')) { <span class="nh-greska">Upiši naziv hotela.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="h-zvezdice">Broj zvezdica</label>
+        <select id="h-zvezdice" formControlName="brojZvezdica">
+          @for (z of [1, 2, 3, 4, 5]; track z) {
+            <option [ngValue]="z">{{ z }}</option>
+          }
+        </select>
+      </div>
+      <div class="nh-polje">
+        <label for="h-grad">Grad</label>
+        <select id="h-grad" formControlName="gradId" (change)="izborGrada($any($event.target).value)" [attr.aria-invalid]="neispravno('hotel', 'gradId')">
+          <option value="">Izaberi grad</option>
+          @for (g of gradovi(); track g.id) {
+            <option [value]="g.id">{{ g.naziv }}, {{ g.drzavaNaziv }}</option>
+          }
+          <option [value]="novaVrsta">+ Grad nije na listi</option>
+        </select>
+        @if (neispravno('hotel', 'gradId')) { <span class="nh-greska">Izaberi grad.</span> }
+      </div>
+      @if (noviGradOtvoren()) {
+        <div class="nh-umetak nh-polje--siroko" [formGroup]="gradForma">
+          <p class="nh-umetak__naslov">Novi grad</p>
+          <div class="nh-polje">
+            <label for="g-naziv">Naziv grada</label>
+            <input id="g-naziv" formControlName="naziv">
+          </div>
+          <div class="nh-polje">
+            <label for="g-postanski">Poštanski broj</label>
+            <input id="g-postanski" formControlName="postanskiBroj">
+          </div>
+          <div class="nh-polje">
+            <label for="g-drzava">Država</label>
+            <select id="g-drzava" formControlName="drzavaId">
+              <option value="">Izaberi državu</option>
+              @for (d of drzave(); track d.id) {
+                <option [value]="d.id">{{ d.naziv }}</option>
+              }
+            </select>
+          </div>
+          <div class="nh-umetak__dugmad">
+            <button type="button" class="desk-dugme desk-dugme--glavno" (click)="sacuvajGrad()">Dodaj grad</button>
+            <button type="button" class="desk-dugme" (click)="noviGradOtvoren.set(false)">Otkaži</button>
+          </div>
+          @if (greskaGrada()) { <p class="desk-greska nh-umetak__greska" role="alert">{{ greskaGrada() }}</p> }
+        </div>
+      }
+      <div class="nh-polje">
+        <label for="h-ulica">Ulica</label>
+        <input id="h-ulica" formControlName="ulica" [attr.aria-invalid]="neispravno('hotel', 'ulica')">
+        @if (neispravno('hotel', 'ulica')) { <span class="nh-greska">Upiši ulicu.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="h-broj">Broj</label>
+        <input id="h-broj" formControlName="broj" [attr.aria-invalid]="neispravno('hotel', 'broj')">
+        @if (neispravno('hotel', 'broj')) { <span class="nh-greska">Upiši kućni broj.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="h-email">Email hotela (nije obavezno)</label>
+        <input id="h-email" type="email" formControlName="email" [attr.aria-invalid]="neispravno('hotel', 'email')">
+        @if (neispravno('hotel', 'email')) { <span class="nh-greska">Upiši ispravan email.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="h-telefon">Telefon hotela (nije obavezno)</label>
+        <input id="h-telefon" type="tel" formControlName="brojTelefona">
+      </div>
+      <div class="nh-polje nh-polje--siroko">
+        <label for="h-opis">Opis (nije obavezno)</label>
+        <textarea id="h-opis" rows="3" formControlName="opis"></textarea>
+      </div>
+      <div class="nh-dno">
+        @if (greska()) { <p class="desk-greska" role="alert">{{ greska() }}</p> }
+        <div class="nh-dugmad">
+          <button type="submit" class="desk-dugme desk-dugme--glavno" [disabled]="cuva()">{{ cuva() ? 'Čuvanje' : 'Sačuvaj i dodaj sobe' }}</button>
+          <button type="button" class="desk-dugme" (click)="zatvori.emit()">Otkaži</button>
+        </div>
+      </div>
+    </form>
+  }
+
+  @if (korak() === 'sobe') {
+    <div class="nh-sobe">
+      @for (s of spratovi(); track s.broj) {
+        <div class="desk-panel nh-sprat">
+          <div class="nh-sprat__glava">
+            <p class="nh-sprat__naslov">{{ s.broj }}. sprat <span>{{ brojSoba(s.sobe.length) }}</span></p>
+            <button type="button" class="desk-dugme" (click)="ukloniSprat(s.broj)">Ukloni sprat</button>
+          </div>
+          @if (s.sobe.length) {
+            <table class="desk-tabela">
+              <thead><tr><th>Broj sobe</th><th>Vrsta</th><th>Cena po noći (€)</th><th></th></tr></thead>
+              <tbody>
+                @for (x of s.sobe; track x.kljuc) {
+                  <tr>
+                    <td><input class="desk-izbor nh-broj" type="number" min="1" [value]="x.brojSobe ?? ''" [attr.aria-label]="'Broj sobe, ' + s.broj + '. sprat'" (change)="izmeniSobu(s.broj, x.kljuc, 'brojSobe', $any($event.target).value)"></td>
+                    <td>
+                      <select class="desk-izbor" [attr.aria-label]="'Vrsta sobe ' + (x.brojSobe ?? '')"
+                        (change)="izborTipa(s.broj, x.kljuc, $any($event.target).value); $any($event.target).value = x.tipSobeId ?? ''">
+                        <option value="" [selected]="!x.tipSobeId">Izaberi vrstu</option>
+                        @for (t of tipovi(); track t.id) {
+                          <option [value]="t.id" [selected]="t.id === x.tipSobeId">{{ t.tip }} · do {{ t.maxGostiju }}</option>
+                        }
+                        <option [value]="novaVrsta">+ Nova vrsta sobe</option>
+                      </select>
+                    </td>
+                    <td><input class="desk-izbor nh-cena" type="number" min="1" step="5" [value]="x.cenaPoNoci ?? ''" [attr.aria-label]="'Cena za sobu ' + (x.brojSobe ?? '')" (change)="izmeniSobu(s.broj, x.kljuc, 'cenaPoNoci', $any($event.target).value)"></td>
+                    <td class="desk-tabela__akcija"><button type="button" class="desk-dugme" [attr.aria-label]="'Ukloni sobu ' + (x.brojSobe ?? '')" (click)="ukloniSobu(s.broj, x.kljuc)">Ukloni</button></td>
+                  </tr>
+                  @if (noviTipZa() === x.kljuc) {
+                    <tr>
+                      <td colspan="4">
+                        <div class="nh-umetak" [formGroup]="tipForma">
+                          <p class="nh-umetak__naslov">Nova vrsta sobe</p>
+                          <div class="nh-polje">
+                            <label [for]="'t-naziv-' + x.kljuc">Naziv vrste</label>
+                            <input [id]="'t-naziv-' + x.kljuc" formControlName="tip">
+                          </div>
+                          <div class="nh-polje">
+                            <label [for]="'t-gosti-' + x.kljuc">Najviše gostiju</label>
+                            <input [id]="'t-gosti-' + x.kljuc" type="number" min="1" formControlName="maxGostiju">
+                          </div>
+                          <div class="nh-polje">
+                            <label [for]="'t-opis-' + x.kljuc">Opis (nije obavezno)</label>
+                            <input [id]="'t-opis-' + x.kljuc" formControlName="opis">
+                          </div>
+                          <div class="nh-umetak__dugmad">
+                            <button type="button" class="desk-dugme desk-dugme--glavno" (click)="sacuvajTip(s.broj, x.kljuc)">Dodaj vrstu</button>
+                            <button type="button" class="desk-dugme" (click)="otkaziTip()">Otkaži</button>
+                          </div>
+                          @if (greskaTipa()) { <p class="desk-greska nh-umetak__greska" role="alert">{{ greskaTipa() }}</p> }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          }
+          <div class="nh-sprat__dno">
+            <button type="button" class="desk-dugme" (click)="dodajSobu(s.broj)">+ Dodaj sobu na {{ s.broj }}. sprat</button>
+          </div>
+        </div>
+      }
+      <button type="button" class="nh-novi-sprat" (click)="dodajSprat()"><span aria-hidden="true">+</span> Dodaj sprat</button>
+      <div class="nh-dno">
+        @if (greska()) { <p class="desk-greska" role="alert">{{ greska() }}</p> }
+        <p class="nh-zbir">Ukupno {{ brojSoba(ukupnoSoba()) }} {{ naSpratova(spratovi().length) }}.</p>
+        <div class="nh-dugmad">
+          <button type="button" class="desk-dugme desk-dugme--glavno" [disabled]="cuva()" (click)="sacuvajSobe()">{{ cuva() ? 'Čuvanje' : 'Sačuvaj sobe i dodaj menadžera' }}</button>
+          <button type="button" class="desk-dugme" (click)="zatvori.emit()">Kasnije</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (korak() === 'menadzer') {
+    <form class="desk-panel nh-forma" [formGroup]="menadzerForma" (ngSubmit)="sacuvajMenadzera()" novalidate>
+      <div class="nh-polje">
+        <label for="m-ime">Ime</label>
+        <input id="m-ime" formControlName="ime" autocomplete="off" [attr.aria-invalid]="neispravno('menadzer', 'ime')">
+        @if (neispravno('menadzer', 'ime')) { <span class="nh-greska">Upiši ime.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="m-prezime">Prezime</label>
+        <input id="m-prezime" formControlName="prezime" autocomplete="off" [attr.aria-invalid]="neispravno('menadzer', 'prezime')">
+        @if (neispravno('menadzer', 'prezime')) { <span class="nh-greska">Upiši prezime.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="m-email">Email za prijavu</label>
+        <input id="m-email" type="email" formControlName="email" autocomplete="off" [attr.aria-invalid]="neispravno('menadzer', 'email')">
+        @if (neispravno('menadzer', 'email')) { <span class="nh-greska">Upiši email adresu sa &#64;.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="m-lozinka">Početna lozinka</label>
+        <input id="m-lozinka" type="text" formControlName="password" autocomplete="off" [attr.aria-invalid]="neispravno('menadzer', 'password')">
+        @if (neispravno('menadzer', 'password')) { <span class="nh-greska">Najmanje 8 znakova.</span> }
+      </div>
+      <div class="nh-polje">
+        <label for="m-telefon">Telefon (nije obavezno)</label>
+        <input id="m-telefon" type="tel" formControlName="brojTelefona" autocomplete="off">
+      </div>
+      <div class="nh-dno">
+        @if (greska()) { <p class="desk-greska" role="alert">{{ greska() }}</p> }
+        <div class="nh-dugmad">
+          <button type="submit" class="desk-dugme desk-dugme--glavno" [disabled]="cuva()">{{ cuva() ? 'Čuvanje' : 'Napravi menadžera' }}</button>
+          <button type="button" class="desk-dugme" (click)="zatvori.emit()">Kasnije</button>
+        </div>
+      </div>
+    </form>
+  }
+</section>
