@@ -38,12 +38,21 @@ public class KorisnikDTO {
     @JsonProperty(access = READ_ONLY)
     private Uloga uloga;
 
+    @JsonProperty(access = READ_ONLY)
+    private TipZaposlenog tipZaposlenog;
+
+    @JsonProperty(access = READ_ONLY)
+    private Long hotelId;
+
     public static KorisnikDTO from(Korisnik k) {
         if (k == null) {
             return null;
         }
+        Zaposleni z = Hibernate.unproxy(k) instanceof Zaposleni zap ? zap : null;
         return new KorisnikDTO(k.getId(), k.getIme(), k.getPrezime(), k.getEmail(),
-                k.getBrojTelefona(), k.getPol(), ulogaOf(k));
+                k.getBrojTelefona(), k.getPol(), ulogaOf(k),
+                z != null ? z.getTipZaposlenog() : null,
+                z != null ? z.getHotel().getId() : null);
     }
 
     public static Uloga ulogaOf(Korisnik k) {

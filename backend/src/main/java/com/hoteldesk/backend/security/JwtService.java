@@ -2,6 +2,8 @@ package com.hoteldesk.backend.security;
 
 import com.hoteldesk.backend.DTO.KorisnikDTO;
 import com.hoteldesk.backend.model.Korisnik;
+import com.hoteldesk.backend.model.Zaposleni;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -17,6 +19,8 @@ import java.time.temporal.ChronoUnit;
 public class JwtService {
 
     public static final String CLAIM_ULOGA = "uloga";
+    public static final String CLAIM_TIP_ZAPOSLENOG = "tipZaposlenog";
+    public static final String CLAIM_HOTEL = "hotelId";
 
     private final JwtEncoder jwtEncoder;
     private final long trajanjeMinuta;
@@ -28,15 +32,18 @@ public class JwtService {
 
     public String generisiToken(Korisnik korisnik) {
         Instant sada = Instant.now();
-        JwtClaimsSet claims = JwtClaimsSet.builder()
+        JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
                 .issuer("hoteldesk")
                 .subject(korisnik.getId().toString())
                 .issuedAt(sada)
                 .expiresAt(sada.plus(trajanjeMinuta, ChronoUnit.MINUTES))
                 .claim("email", korisnik.getEmail())
-                .claim(CLAIM_ULOGA, KorisnikDTO.ulogaOf(korisnik).name())
-                .build();
+                .claim(CLAIM_ULOGA, KorisnikDTO.ulogaOf(korisnik).name());
+        if (Hibernate.unproxy(korisnik) instanceof Zaposleni zaposleni) {
+            claims.claim(CLAIM_TIP_ZAPOSLENOG, zaposleni.getTipZaposlenog().name())
+                    .claim(CLAIM_HOTEL, zaposleni.getHotel().getId());
+        }
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims.build())).getTokenValue();
     }
 }
