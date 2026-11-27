@@ -1,0 +1,80 @@
+.profil {
+  position: relative;
+}
+
+.profil__dugme {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--p-ink);
+  color: var(--p-bg);
+  font: 500 15px/1 var(--font-text);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.profil__dugme:hover {
+  background: color-mix(in oklab, var(--p-ink) 85%, var(--p-bg));
+}
+
+.profil__meni {
+  position: absolute;
+  top: calc(100% + var(--s-2));
+  right: 0;
+  z-index: 20;
+  min-width: 240px;
+  padding: var(--s-4);
+  border: 1px solid var(--line-strong, rgba(42, 45, 52, 0.2));
+  border-radius: var(--r-md);
+  background: var(--p-bg);
+  box-shadow: 0 12px 32px rgba(42, 45, 52, 0.16);
+}
+
+.profil__ime {
+  margin: 0;
+  font-weight: 500;
+}
+
+.profil__email {
+  margin: var(--s-1) 0 0;
+  font-size: var(--t-small);
+  color: var(--p-muted);
+  overflow-wrap: anywhere;
+}
+
+.profil__odjava {
+  width: 100%;
+  height: 44px;
+  margin-top: var(--s-4);
+  border: 1px solid var(--line-strong, rgba(42, 45, 52, 0.2));
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--p-ink);
+  font: 500 15px/1 var(--font-text);
+  cursor: pointer;
+}
+
+.profil__odjava:hover {
+  background: var(--p-surface);
+}
+
+.profil__desk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  margin-top: var(--s-4);
+  border-radius: var(--r-sm);
+  background: var(--p-action);
+  color: var(--p-action-ink);
+  font: 500 15px/1 var(--font-text);
+  text-decoration: none;
+}
+
+.profil__desk + .profil__odjava {
+  margin-top: var(--s-2);
+}

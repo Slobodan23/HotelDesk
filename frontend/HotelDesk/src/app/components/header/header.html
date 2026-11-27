@@ -35,7 +35,24 @@
       <div class="nav__item"><a class="nav__link" href="#pitanja">Pitanja</a></div>
     </nav>
     <div class="nav__actions">
-      <a class="nav__link" href="/prijava">Prijava</a>
+      @if (auth.korisnik(); as k) {
+        <div class="profil">
+          <button type="button" class="profil__dugme" (click)="meniOtvoren.set(!meniOtvoren())"
+            [attr.aria-expanded]="meniOtvoren()" aria-controls="profil-meni" [attr.aria-label]="'Nalog: ' + k.ime + ' ' + k.prezime">{{ inicijali() }}</button>
+          @if (meniOtvoren()) {
+            <div class="profil__meni" id="profil-meni">
+              <p class="profil__ime">{{ k.ime }} {{ k.prezime }}</p>
+              <p class="profil__email">{{ k.email }}</p>
+              @if (desk(); as d) {
+                <a class="profil__desk" [routerLink]="d.url" (click)="meniOtvoren.set(false)">Otvori {{ d.naziv }}</a>
+              }
+              <button type="button" class="profil__odjava" (click)="odjavi()">Odjava</button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a class="nav__link" routerLink="/prijava">Prijava</a>
+      }
       <a class="btn btn--primary" href="#pretraga">Pronađi sobu</a>
     </div>
     <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Meni">

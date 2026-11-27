@@ -1,0 +1,36 @@
+<main id="top">
+  <section class="section auth" aria-labelledby="prijava-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-5 auth__kolona">
+          <h1 id="prijava-h">Prijava na HotelDesk</h1>
+          <p class="auth__uvod">Prijavi se da rezervišeš sobu, vidiš svoje rezervacije i oceniš hotel posle boravka.</p>
+
+          <form class="auth-forma" [formGroup]="forma" (ngSubmit)="prijavi()" novalidate>
+            <div class="field">
+              <label for="p-email">Email</label>
+              <input id="p-email" type="email" formControlName="email" autocomplete="email" inputmode="email"
+                [attr.aria-invalid]="neispravno('email')" aria-describedby="p-email-err">
+              <p class="field__error" id="p-email-err" [hidden]="!neispravno('email')">Upiši email adresu sa @, na primer ime&#64;gmail.com.</p>
+            </div>
+            <div class="field">
+              <label for="p-lozinka">Lozinka</label>
+              <input id="p-lozinka" type="password" formControlName="password" autocomplete="current-password"
+                [attr.aria-invalid]="neispravno('password')" aria-describedby="p-lozinka-err">
+              <p class="field__error" id="p-lozinka-err" [hidden]="!neispravno('password')">Upiši lozinku.</p>
+            </div>
+            <button class="btn btn--primary auth__dugme" type="submit" [disabled]="salje()">
+              {{ salje() ? 'Prijavljivanje' : 'Prijavi se' }}
+            </button>
+            <p class="form__status auth__status" role="status">{{ greska() }}</p>
+          </form>
+
+          <p class="auth__dno">Nemaš nalog? <a class="link" routerLink="/registracija" [queryParams]="povratak() ? { povratak: povratak() } : {}">Napravi nalog</a></p>
+        </div>
+        <div class="span-6 start-7 auth__slika">
+          <img src="assets/img/photo-f157666886-960.jpg" srcset="assets/img/photo-f157666886-500.jpg 500w, assets/img/photo-f157666886-960.jpg 960w" sizes="(max-width: 1023px) 100vw, 50vw" width="960" height="640" alt="Šumoviti vrhovi Kopaonika">
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
