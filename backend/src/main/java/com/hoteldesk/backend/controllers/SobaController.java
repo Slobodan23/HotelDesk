@@ -1,5 +1,6 @@
 package com.hoteldesk.backend.controllers;
 
+import com.hoteldesk.backend.DTO.NoveSobeRequest;
 import com.hoteldesk.backend.DTO.SobaDTO;
 import com.hoteldesk.backend.DTO.SobaStatusRequest;
 import com.hoteldesk.backend.model.StatusSobe;
@@ -48,6 +49,12 @@ public class SobaController {
     @ResponseStatus(HttpStatus.CREATED)
     public SobaDTO kreiraj(@Valid @RequestBody SobaDTO dto) {
         return sobaService.kreiraj(dto, trenutniKorisnik.getId());
+    }
+
+    @PostMapping("/hoteli/{hotelId}/sobe")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<SobaDTO> kreirajSve(@PathVariable Long hotelId, @Valid @RequestBody NoveSobeRequest request) {
+        return sobaService.kreirajSve(hotelId, request.getSobe(), trenutniKorisnik.getId());
     }
 
     @PutMapping("/sobe/{id}")

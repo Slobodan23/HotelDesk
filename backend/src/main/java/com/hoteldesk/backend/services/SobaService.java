@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +63,27 @@ public class SobaService {
         soba.setHotel(hotel);
         popuni(soba, dto);
         return SobaDTO.from(sobaRepository.save(soba));
+    }
+
+    @Transactional
+    public List<SobaDTO> kreirajSve(Long hotelId, List<SobaDTO> sobe, Long korisnikId) {
+        Hotel hotel = hotelService.getHotel(hotelId);
+        hotelService.proveriUpravljanje(hotel, korisnikId);
+        Set<Integer> brojevi = new HashSet<>();
+        for (SobaDTO dto : sobe) {
+            if (!brojevi.add(dto.getBrojSobe())) {
+                throw new ConflictException("Broj sobe " + dto.getBrojSobe() + " je unet dva puta");
+            }
+            if (sobaRepository.existsByHotelIdAndBrojSobe(hotelId, dto.getBrojSobe())) {
+                throw new ConflictException("Soba " + dto.getBrojSobe() + " vec postoji u hotelu");
+            }
+        }
+        return sobe.stream().map(dto -> {
+            Soba soba = new Soba();
+            soba.setHotel(hotel);
+            popuni(soba, dto);
+            return SobaDTO.from(sobaRepository.save(soba));
+        }).toList();
     }
 
     @Transactional

@@ -29,7 +29,7 @@ public class GradController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'VLASNIK')")
     public GradDTO kreiraj(@Valid @RequestBody GradDTO dto) {
         return gradService.kreiraj(dto);
     }

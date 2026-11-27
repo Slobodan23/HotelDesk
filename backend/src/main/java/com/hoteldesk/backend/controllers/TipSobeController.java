@@ -29,7 +29,7 @@ public class TipSobeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'VLASNIK')")
     public TipSobeDTO kreiraj(@Valid @RequestBody TipSobeDTO dto) {
         return tipSobeService.kreiraj(dto);
     }
