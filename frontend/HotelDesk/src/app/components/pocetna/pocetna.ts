@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, afterNextRender, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -14,7 +14,61 @@ interface Destinacija {
   naziv: string;
   drzava: string;
   brojHotela: number;
+  slika: Slika;
 }
+
+interface Slika {
+  src: string;
+  srcset: string;
+  alt: string;
+}
+
+const PO_STRANI = 6;
+
+const SLIKE_GRADOVA: Record<string, Slika> = {
+  Beograd: {
+    src: 'assets/img/photo-f110403744-960.jpg',
+    srcset: 'assets/img/photo-f110403744-500.jpg 500w, assets/img/photo-f110403744-960.jpg 960w',
+    alt: 'Kalemegdanska tvrđava i ušće Save u Dunav pri zalasku sunca'
+  },
+  'Novi Sad': {
+    src: 'assets/img/photo-f51508079-960.jpg',
+    srcset: 'assets/img/photo-f51508079-500.jpg 500w, assets/img/photo-f51508079-960.jpg 960w',
+    alt: 'Petrovaradinska tvrđava iznad Dunava'
+  },
+  Niš: {
+    src: 'assets/img/photo-f35650253-960.jpg',
+    srcset: 'assets/img/photo-f35650253-500.jpg 500w, assets/img/photo-f35650253-960.jpg 960w',
+    alt: 'Kamena kapija Niške tvrđave'
+  },
+  Zlatibor: {
+    src: 'assets/img/photo-f195715241-960.jpg',
+    srcset: 'assets/img/photo-f195715241-500.jpg 500w, assets/img/photo-f195715241-960.jpg 960w',
+    alt: 'Pašnjaci i brda Zlatibora sa kućom od drveta'
+  },
+  Kopaonik: {
+    src: 'assets/img/photo-f157666886-960.jpg',
+    srcset: 'assets/img/photo-f157666886-500.jpg 500w, assets/img/photo-f157666886-960.jpg 960w',
+    alt: 'Šumoviti vrhovi Kopaonika'
+  },
+  Budva: {
+    src: 'assets/img/photo-f106409013-960.jpg',
+    srcset: 'assets/img/photo-f106409013-500.jpg 500w, assets/img/photo-f106409013-960.jpg 960w',
+    alt: 'Šetalište uz more u Budvi i ostrvo Sveti Nikola'
+  },
+  Kotor: {
+    src: 'assets/img/photo-f22143533-960.jpg',
+    srcset: 'assets/img/photo-f22143533-500.jpg 500w, assets/img/photo-f22143533-960.jpg 960w',
+    alt: 'Kameni zvonik u starom gradu Kotoru i zidine na brdu'
+  },
+  Dubrovnik: {
+    src: 'assets/img/photo-f79842579-960.jpg',
+    srcset: 'assets/img/photo-f79842579-500.jpg 500w, assets/img/photo-f79842579-960.jpg 960w',
+    alt: 'Crveni krovovi starog grada Dubrovnika'
+  }
+};
+
+const SKRIPTE = ['assets/system.js', 'assets/motion/motion.js', 'assets/layout/layout.js'];
 
 function uIsoDatum(datum: Date): string {
   const m = String(datum.getMonth() + 1).padStart(2, '0');
@@ -25,6 +79,17 @@ function uIsoDatum(datum: Date): string {
 function dodajDane(iso: string, dani: number): string {
   const [g, m, d] = iso.split('-').map(Number);
   return uIsoDatum(new Date(g, m - 1, d + dani));
+}
+
+function brojHotela(n: number): string {
+  return n % 10 === 1 && n % 100 !== 11 ? `${n} hotel` : `${n} hotela`;
+}
+
+function brojGradova(n: number): string {
+  if (n % 10 === 1 && n % 100 !== 11) {
+    return `${n} gradu`;
+  }
+  return `${n} gradova`;
 }
 
 @Component({
@@ -41,13 +106,15 @@ export class Pocetna {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly danas = uIsoDatum(new Date());
+  protected readonly brojHotela = brojHotela;
 
   protected readonly forma = inject(FormBuilder).nonNullable.group({
     gradId: '',
     naziv: '',
     dolazak: '',
     odlazak: '',
-    gosti: 2
+    gosti: 2,
+    minZvezdica: ''
   });
 
   protected readonly gradovi = signal<Grad[]>([]);
@@ -56,17 +123,18 @@ export class Pocetna {
   protected readonly ucitavanje = signal(true);
   protected readonly greska = signal<string | null>(null);
   protected readonly greskaForme = signal<string | null>(null);
-  protected readonly minZvezdica = signal<number | null>(null);
   protected readonly sortiranje = signal<Sortiranje>('preporuka');
+  protected readonly strana = signal(0);
   protected readonly upit = signal<Record<string, string>>({});
-  protected readonly aktivanGrad = signal<string | null>(null);
-
-  protected readonly zvezdiceOpcije = [3, 4, 5];
 
   protected readonly destinacije = computed<Destinacija[]>(() => {
     const mapa = new Map<number, Destinacija>();
     for (const h of this.sviHoteli()) {
       const a = h.adresa;
+      const slika = SLIKE_GRADOVA[a.gradNaziv ?? ''];
+      if (!slika) {
+        continue;
+      }
       const postojeca = mapa.get(a.gradId);
       if (postojeca) {
         postojeca.brojHotela++;
@@ -75,11 +143,12 @@ export class Pocetna {
           gradId: a.gradId,
           naziv: a.gradNaziv ?? '',
           drzava: a.drzavaNaziv ?? '',
-          brojHotela: 1
+          brojHotela: 1,
+          slika
         });
       }
     }
-    return [...mapa.values()].sort((a, b) => b.brojHotela - a.brojHotela || a.naziv.localeCompare(b.naziv));
+    return [...mapa.values()].sort((a, b) => b.brojHotela - a.brojHotela || a.naziv.localeCompare(b.naziv)).slice(0, 8);
   });
 
   protected readonly gradoviSaHotelima = computed(() => {
@@ -89,7 +158,21 @@ export class Pocetna {
       .sort((a, b) => a.naziv.localeCompare(b.naziv));
   });
 
-  protected readonly prikazaniHoteli = computed(() => {
+  protected readonly najbolji = computed(() => {
+    const ocenjeni = this.sviHoteli().filter((h) => h.prosecnaOcena != null);
+    return ocenjeni.sort((a, b) => (b.prosecnaOcena ?? 0) - (a.prosecnaOcena ?? 0))[0] ?? null;
+  });
+
+  protected readonly najava = computed(() => {
+    const hoteli = this.sviHoteli();
+    if (!hoteli.length) {
+      return 'Srbija, Crna Gora i Hrvatska';
+    }
+    const gradova = new Set(hoteli.map((h) => h.adresa.gradId)).size;
+    return `${brojHotela(hoteli.length)} u ${brojGradova(gradova)}`;
+  });
+
+  protected readonly sortirani = computed(() => {
     const lista = [...this.hoteli()];
     const ocena = (h: Hotel) => h.prosecnaOcena ?? 0;
     switch (this.sortiranje()) {
@@ -104,6 +187,13 @@ export class Pocetna {
           (a, b) => ocena(b) * 2 + (b.brojZvezdica ?? 0) - (ocena(a) * 2 + (a.brojZvezdica ?? 0))
         );
     }
+  });
+
+  protected readonly brojStrana = computed(() => Math.max(1, Math.ceil(this.hoteli().length / PO_STRANI)));
+
+  protected readonly prikazani = computed(() => {
+    const od = this.strana() * PO_STRANI;
+    return this.sortirani().slice(od, od + PO_STRANI);
   });
 
   protected readonly brojNoci = computed(() => {
@@ -127,6 +217,8 @@ export class Pocetna {
       .subscribe({ next: (h) => this.sviHoteli.set(h) });
 
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((p) => this.primeniUpit(p));
+
+    afterNextRender(() => this.ucitajSkripte());
   }
 
   protected promenaDolaska(): void {
@@ -138,26 +230,25 @@ export class Pocetna {
 
   protected minOdlazak(): string {
     const dolazak = this.forma.controls.dolazak.value;
-    return dolazak ? dodajDane(dolazak, 1) : dodajDane(this.danas, 1);
-  }
-
-  protected promeniGoste(korak: number): void {
-    const c = this.forma.controls.gosti;
-    c.setValue(Math.min(8, Math.max(1, c.value + korak)));
+    return dodajDane(dolazak || this.danas, 1);
   }
 
   protected pretrazi(): void {
-    const { gradId, naziv, dolazak, odlazak, gosti } = this.forma.getRawValue();
+    const { gradId, naziv, dolazak, odlazak, gosti, minZvezdica } = this.forma.getRawValue();
     if ((dolazak && !odlazak) || (!dolazak && odlazak)) {
-      this.greskaForme.set('Izaberite i datum dolaska i datum odlaska.');
+      this.greskaForme.set('Upiši i dan dolaska i dan odlaska.');
       return;
     }
     if (dolazak && dolazak < this.danas) {
-      this.greskaForme.set('Datum dolaska ne može biti u prošlosti.');
+      this.greskaForme.set('Dan dolaska ne može biti u prošlosti.');
       return;
     }
     if (dolazak && odlazak <= dolazak) {
-      this.greskaForme.set('Datum odlaska mora biti posle datuma dolaska.');
+      this.greskaForme.set('Dan odlaska mora biti posle dana dolaska.');
+      return;
+    }
+    if (!gosti || gosti < 1 || gosti > 8) {
+      this.greskaForme.set('Upiši broj gostiju od 1 do 8.');
       return;
     }
     this.greskaForme.set(null);
@@ -166,7 +257,8 @@ export class Pocetna {
       naziv: naziv.trim() || null,
       dolazak: dolazak || null,
       odlazak: odlazak || null,
-      gosti: dolazak ? gosti : null
+      gosti: dolazak ? gosti : null,
+      minZvezdica: minZvezdica || null
     });
   }
 
@@ -175,16 +267,17 @@ export class Pocetna {
     this.idiNa({ gradId: d.gradId, naziv: null });
   }
 
-  protected izaberiZvezdice(z: number | null): void {
-    this.idiNa({ minZvezdica: this.minZvezdica() === z ? null : z });
-  }
-
   protected promeniSortiranje(vrednost: string): void {
     this.sortiranje.set(vrednost as Sortiranje);
+    this.strana.set(0);
+  }
+
+  protected idiNaStranu(korak: number): void {
+    this.strana.set(Math.min(this.brojStrana() - 1, Math.max(0, this.strana() + korak)));
   }
 
   protected ponisti(): void {
-    this.forma.reset({ gradId: '', naziv: '', dolazak: '', odlazak: '', gosti: 2 });
+    this.forma.reset({ gradId: '', naziv: '', dolazak: '', odlazak: '', gosti: 2, minZvezdica: '' });
     this.greskaForme.set(null);
     this.router.navigate([], { queryParams: {} });
   }
@@ -195,8 +288,8 @@ export class Pocetna {
 
   private idiNa(promene: Record<string, string | number | null>): void {
     this.router
-      .navigate([], { queryParams: promene, queryParamsHandling: 'merge' })
-      .then(() => document.getElementById('rezultati')?.scrollIntoView({ behavior: 'smooth' }));
+      .navigate([], { queryParams: promene, queryParamsHandling: 'merge', preserveFragment: false })
+      .then(() => document.getElementById('pretraga')?.scrollIntoView());
   }
 
   private primeniUpit(p: ParamMap): void {
@@ -205,10 +298,9 @@ export class Pocetna {
     const dolazak = p.get('dolazak') ?? '';
     const odlazak = p.get('odlazak') ?? '';
     const gosti = Number(p.get('gosti')) || 2;
-    const minZvezdica = Number(p.get('minZvezdica')) || null;
+    const minZvezdica = p.get('minZvezdica') ?? '';
 
-    this.forma.patchValue({ gradId, naziv, dolazak, odlazak, gosti });
-    this.minZvezdica.set(minZvezdica);
+    this.forma.patchValue({ gradId, naziv, dolazak, odlazak, gosti, minZvezdica });
 
     const upit: Record<string, string> = {};
     if (dolazak && odlazak) {
@@ -217,30 +309,35 @@ export class Pocetna {
       upit['gosti'] = String(gosti);
     }
     this.upit.set(upit);
+    this.strana.set(0);
 
     this.ucitavanje.set(true);
     this.greska.set(null);
     this.hotelService
-      .pretraga({ gradId: gradId ? Number(gradId) : null, naziv, minZvezdica })
+      .pretraga({ gradId: gradId ? Number(gradId) : null, naziv, minZvezdica: minZvezdica ? Number(minZvezdica) : null })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (h) => {
           this.hoteli.set(h);
-          this.aktivanGrad.set(h[0]?.adresa.gradNaziv && gradId ? h[0].adresa.gradNaziv : this.nazivGrada(gradId));
           this.ucitavanje.set(false);
         },
         error: () => {
           this.hoteli.set([]);
-          this.greska.set('Trenutno ne možemo da učitamo hotele. Proverite da li je server pokrenut.');
+          this.greska.set('Hoteli trenutno ne mogu da se učitaju. Proveri da li je server pokrenut.');
           this.ucitavanje.set(false);
         }
       });
   }
 
-  private nazivGrada(gradId: string): string | null {
-    if (!gradId) {
-      return null;
+  private ucitajSkripte(): void {
+    for (const src of SKRIPTE) {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        continue;
+      }
+      const s = document.createElement('script');
+      s.type = 'module';
+      s.src = src;
+      document.body.appendChild(s);
     }
-    return this.gradovi().find((g) => String(g.id) === gradId)?.naziv ?? null;
   }
 }

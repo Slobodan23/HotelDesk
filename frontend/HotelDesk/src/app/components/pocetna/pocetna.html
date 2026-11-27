@@ -1,154 +1,243 @@
-<section class="uvod">
-  <div class="kontejner">
-    <div class="uvod-tekst">
-      <span class="nadnaslov">Srbija · Crna Gora · Hrvatska i region</span>
-      <h1>Odmor počinje<br />pre <em>prvog koraka</em>.</h1>
-      <p>Izaberi grad, datume i broj gostiju, a mi ćemo ti pokazati hotele u kojima te čeka slobodna soba.</p>
-    </div>
-
-    <form class="pretraga" [formGroup]="forma" (ngSubmit)="pretrazi()">
-      <label class="polje polje-siroko">
-        <span class="oznaka">Destinacija</span>
-        <select formControlName="gradId">
-          <option value="">Svi gradovi</option>
-          @for (g of gradoviSaHotelima(); track g.id) {
-            <option [value]="g.id">{{ g.naziv }}, {{ g.drzavaNaziv }}</option>
-          }
-        </select>
-      </label>
-
-      <label class="polje">
-        <span class="oznaka">Dolazak</span>
-        <input type="date" formControlName="dolazak" [min]="danas" (change)="promenaDolaska()" />
-      </label>
-
-      <label class="polje">
-        <span class="oznaka">Odlazak</span>
-        <input type="date" formControlName="odlazak" [min]="minOdlazak()" />
-      </label>
-
-      <div class="polje polje-gosti">
-        <span class="oznaka">Gosti</span>
-        <div class="brojac">
-          <button type="button" (click)="promeniGoste(-1)" [disabled]="forma.controls.gosti.value <= 1" aria-label="Manje gostiju">−</button>
-          <span>{{ forma.controls.gosti.value }}</span>
-          <button type="button" (click)="promeniGoste(1)" [disabled]="forma.controls.gosti.value >= 8" aria-label="Više gostiju">+</button>
+<main id="top">
+  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text grid hero__grid">
+      <div class="hero__text span-5">
+        <p class="hero__kicker"><span class="dot" aria-hidden="true"></span>{{ najava() }}</p>
+        <h1 id="hero-h">Rezervacija hotela u Srbiji i regionu</h1>
+        <p class="hero__lead">Izaberi grad i datume, pa vidi koje sobe su slobodne i koliko košta ceo boravak. Plaćaš karticom odmah ili gotovinom na recepciji.</p>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="#pretraga">Pronađi sobu<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+          <a class="btn btn--secondary" href="#gradovi">Pogledaj gradove</a>
         </div>
       </div>
-
-      <label class="polje polje-naziv">
-        <span class="oznaka">Naziv hotela</span>
-        <input type="text" formControlName="naziv" placeholder="npr. Panorama" />
-      </label>
-
-      <button type="submit" class="dugme dugme-primarno dugme-trazi">Pronađi smeštaj</button>
-
-      @if (greskaForme()) {
-        <p class="greska-forme">{{ greskaForme() }}</p>
-      }
-    </form>
-  </div>
-</section>
-
-@if (destinacije().length) {
-  <section class="kontejner sekcija">
-    <div class="naslov-sekcije">
-      <h2>Kuda ove sezone?</h2>
-      <p>Gradovi u kojima imamo smeštaj</p>
-    </div>
-    <div class="destinacije">
-      @for (d of destinacije(); track d.gradId; let i = $index) {
-        <button type="button" class="destinacija" [class.izabrana]="forma.controls.gradId.value === '' + d.gradId" [attr.data-ton]="i % 4" (click)="izaberiDestinaciju(d)">
-          <span class="dest-naziv">{{ d.naziv }}</span>
-          <span class="dest-drzava">{{ d.drzava }}</span>
-          <span class="dest-broj">{{ d.brojHotela }} {{ d.brojHotela === 1 ? 'hotel' : 'hotela' }}</span>
-        </button>
-      }
-    </div>
-  </section>
-}
-
-<section class="kontejner sekcija" id="rezultati">
-  <div class="rezultati-zaglavlje">
-    <div>
-      <h2>
-        @if (aktivanGrad()) {
-          Hoteli · {{ aktivanGrad() }}
-        } @else {
-          Svi hoteli
-        }
-      </h2>
-      @if (!ucitavanje() && !greska()) {
-        <p class="podnaslov">
-          {{ hoteli().length }} {{ hoteli().length === 1 ? 'rezultat' : 'rezultata' }}
-          @if (brojNoci()) {
-            · {{ brojNoci() }} {{ brojNoci() === 1 ? 'noć' : 'noći' }}, {{ upit()['gosti'] }} {{ upit()['gosti'] === '1' ? 'gost' : 'gosta' }}
-          }
-        </p>
-      }
-    </div>
-
-    <div class="filteri">
-      <div class="zvezdice-filter" role="group" aria-label="Minimalan broj zvezdica">
-        @for (z of zvezdiceOpcije; track z) {
-          <button type="button" [class.aktivan]="minZvezdica() === z" (click)="izaberiZvezdice(z)">{{ z }}★ +</button>
+      <div class="hero__media span-6 start-7">
+        <img src="assets/img/photo-f159687623-960.jpg" srcset="assets/img/photo-f159687623-500.jpg 500w, assets/img/photo-f159687623-960.jpg 960w" sizes="(max-width: 639px) 100vw, 50vw" width="960" height="593" alt="Stari grad Dubrovnik sa lukom i zidinama, pogled odozgo" style="--ly-pos: 50% 55%" fetchpriority="high">
+        @if (najbolji(); as h) {
+          <div class="ly-float">
+            <div class="ly-float__row"><span class="ly-live">Najbolja ocena</span><span>{{ h.prosecnaOcena }} od 10</span></div>
+            <div class="ly-float__title">{{ h.naziv }}, {{ h.adresa.gradNaziv }}</div>
+          </div>
         }
       </div>
-      <label class="sortiranje">
-        <span>Redosled</span>
-        <select [value]="sortiranje()" (change)="promeniSortiranje($any($event.target).value)">
-          <option value="preporuka">Preporučeno</option>
-          <option value="ocena">Najbolje ocenjeni</option>
-          <option value="zvezdice">Broj zvezdica</option>
-          <option value="naziv">Naziv</option>
-        </select>
-      </label>
-    </div>
-  </div>
+    </div></div>
+  </section>
 
-  @if (ucitavanje()) {
-    <div class="mreza">
-      @for (i of [1, 2, 3]; track i) {
-        <div class="kostur"></div>
-      }
-    </div>
-  } @else if (greska()) {
-    <div class="poruka">
-      <h3>Nešto nije u redu</h3>
-      <p>{{ greska() }}</p>
-      <button type="button" class="dugme dugme-primarno" (click)="ponovo()">Pokušaj ponovo</button>
-    </div>
-  } @else if (prikazaniHoteli().length === 0) {
-    <div class="poruka">
-      <h3>Nema hotela za izabrane kriterijume</h3>
-      <p>Probaj drugi grad, manje zvezdica ili ukloni naziv hotela iz pretrage.</p>
-      <button type="button" class="dugme dugme-obrisano" (click)="ponisti()">Poništi pretragu</button>
-    </div>
-  } @else {
-    <div class="mreza">
-      @for (h of prikazaniHoteli(); track h.id) {
-        <app-hotel-kartica [hotel]="h" [upit]="upit()" />
-      }
-    </div>
-  }
-</section>
+  <section class="section" id="pretraga" aria-labelledby="pretraga-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <h2 id="pretraga-h" class="span-5">Hoteli po gradu, datumima i zvezdicama</h2>
+        <p class="span-6 start-7 muted uvod">Sobe i cene za tvoje datume vidiš na stranici hotela. Rezultati dolaze direktno iz HotelDesk baze, sa prosečnom ocenom gostiju.</p>
+      </div>
+      <div class="ui app fill" data-ui-pause-host>
+        <form class="app__pane app__pane--list filteri" [formGroup]="forma" (ngSubmit)="pretrazi()" novalidate>
+          <p class="filteri__naslov">Pretraga</p>
+          <div class="polje">
+            <label for="f-grad">Grad</label>
+            <select id="f-grad" formControlName="gradId">
+              <option value="">Svi gradovi</option>
+              @for (g of gradoviSaHotelima(); track g.id) {
+                <option [value]="g.id">{{ g.naziv }}, {{ g.drzavaNaziv }}</option>
+              }
+            </select>
+          </div>
+          <div class="polja-2">
+            <div class="polje">
+              <label for="f-dolazak">Dolazak</label>
+              <input id="f-dolazak" type="date" formControlName="dolazak" [min]="danas" (change)="promenaDolaska()">
+            </div>
+            <div class="polje">
+              <label for="f-odlazak">Odlazak</label>
+              <input id="f-odlazak" type="date" formControlName="odlazak" [min]="minOdlazak()">
+            </div>
+          </div>
+          <div class="polja-2">
+            <div class="polje">
+              <label for="f-gosti">Gosti</label>
+              <input id="f-gosti" type="number" inputmode="numeric" min="1" max="8" formControlName="gosti">
+            </div>
+            <div class="polje">
+              <label for="f-zvezdice">Zvezdice</label>
+              <select id="f-zvezdice" formControlName="minZvezdica">
+                <option value="">Sve</option>
+                <option value="3">3 i više</option>
+                <option value="4">4 i više</option>
+                <option value="5">Samo 5</option>
+              </select>
+            </div>
+          </div>
+          <div class="polje">
+            <label for="f-naziv">Naziv hotela</label>
+            <input id="f-naziv" type="text" formControlName="naziv" autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn--secondary filteri__dugme">Prikaži hotele</button>
+          <p class="filteri__greska" role="status">{{ greskaForme() }}</p>
+        </form>
 
-<section class="kontejner sekcija">
-  <div class="prednosti">
-    <div class="prednost">
-      <span class="ikonica">01</span>
-      <h3>Cena bez iznenađenja</h3>
-      <p>Ukupna cena boravka je poznata pre potvrde rezervacije.</p>
+        <div class="app__pane app__pane--open rezultati">
+          <div class="rezultati__glava">
+            <p class="rezultati__broj">
+              @if (ucitavanje()) {
+                Učitavanje hotela
+              } @else if (!greska()) {
+                {{ brojHotela(hoteli().length) }}
+                @if (brojNoci()) {
+                  · {{ brojNoci() }} {{ brojNoci() === 1 ? 'noć' : 'noći' }}, {{ upit()['gosti'] }} {{ upit()['gosti'] === '1' ? 'gost' : 'gosta' }}
+                }
+              }
+            </p>
+            <label class="rezultati__sort">
+              <span>Redosled</span>
+              <select [value]="sortiranje()" (change)="promeniSortiranje($any($event.target).value)">
+                <option value="preporuka">Preporučeno</option>
+                <option value="ocena">Najbolje ocenjeni</option>
+                <option value="zvezdice">Broj zvezdica</option>
+                <option value="naziv">Naziv</option>
+              </select>
+            </label>
+          </div>
+
+          @if (ucitavanje()) {
+            <div class="rezultati__mreza">
+              @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+                <div class="kostur"></div>
+              }
+            </div>
+          } @else if (greska()) {
+            <div class="rezultati__poruka">
+              <p class="rezultati__naslov">Server ne odgovara</p>
+              <p>{{ greska() }}</p>
+              <button type="button" class="btn btn--secondary" (click)="ponovo()">Učitaj ponovo</button>
+            </div>
+          } @else if (hoteli().length === 0) {
+            <div class="rezultati__poruka">
+              <p class="rezultati__naslov">Nema hotela za ovu pretragu</p>
+              <p>Probaj drugi grad, manje zvezdica ili obriši naziv hotela.</p>
+              <button type="button" class="btn btn--secondary" (click)="ponisti()">Obriši filtere</button>
+            </div>
+          } @else {
+            <div class="rezultati__mreza">
+              @for (h of prikazani(); track h.id) {
+                <app-hotel-kartica [hotel]="h" [upit]="upit()" />
+              }
+            </div>
+            @if (brojStrana() > 1) {
+              <div class="strane">
+                <button type="button" class="strane__dugme" (click)="idiNaStranu(-1)" [disabled]="strana() === 0" aria-label="Prethodna strana">←</button>
+                <span>Strana {{ strana() + 1 }} od {{ brojStrana() }}</span>
+                <button type="button" class="strane__dugme" (click)="idiNaStranu(1)" [disabled]="strana() >= brojStrana() - 1" aria-label="Sledeća strana">→</button>
+              </div>
+            }
+          }
+        </div>
+      </div>
     </div>
-    <div class="prednost">
-      <span class="ikonica">02</span>
-      <h3>Plaćanje kako ti odgovara</h3>
-      <p>Karticom unapred ili gotovinom pri dolasku u hotel.</p>
+  </section>
+
+  <section class="section" id="gradovi" aria-labelledby="gradovi-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="gradovi-h">Gradovi od Dunava do Jadrana. <span class="muted">Klik na grad prikazuje njegove hotele.</span></h2>
+      </div>
+      <div class="grid gradovi">
+        @for (d of destinacije(); track d.gradId) {
+          <button type="button" class="grad span-3" (click)="izaberiDestinaciju(d)">
+            <span class="grad__slika"><img [src]="d.slika.src" [attr.srcset]="d.slika.srcset" sizes="(max-width: 639px) 100vw, 25vw" [alt]="d.slika.alt" loading="lazy" decoding="async"></span>
+            <span class="grad__red">
+              <span class="grad__naziv">{{ d.naziv }}</span>
+              <span class="grad__broj">{{ brojHotela(d.brojHotela) }}</span>
+            </span>
+            <span class="grad__drzava">{{ d.drzava }}</span>
+          </button>
+        }
+      </div>
     </div>
-    <div class="prednost">
-      <span class="ikonica">03</span>
-      <h3>Recenzije pravih gostiju</h3>
-      <p>Ocenu može ostaviti samo gost koji je zaista boravio u hotelu.</p>
+  </section>
+
+  <section class="section statement" id="region" data-moment="giant-type-pass" data-moment-opts='{"image": "assets/img/photo-f22143537-960.jpg", "travel": 60, "focusY": 60}' aria-labelledby="region-h">
+    <div class="wrap">
+      <h2 class="mo-gt__type" id="region-h">Od Dunava<br>do Jadrana</h2>
+      <div class="mo-gt__row"><p>Beograd, Novi Sad i Niš, planine Zlatibor i Kopaonik i obala od Budve do Dubrovnika, u jednoj pretrazi i sa jednim nalogom.</p><a class="link" href="#gradovi">Pogledaj gradove</a></div>
     </div>
-  </div>
-</section>
+  </section>
+
+  <section class="section" id="kako" aria-labelledby="kako-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="kako-h">Rezervacija u 3 koraka. <span class="muted">Od pretrage do recenzije posle odjave.</span></h2>
+      </div>
+      <div class="grid">
+        <article class="card card--row span-4">
+          <span class="step-num">1</span>
+          <h3>Izaberi sobu i datume</h3>
+          <p>Vidiš samo sobe koje su slobodne za tvoje datume i primaju toliko gostiju.</p>
+          <div class="panel korak">
+            <div class="mini">
+              <div class="mini__red"><span>Soba 204 · Dvokrevetna</span><span class="mini__cena">2 gosta</span></div>
+              <div class="mini__red"><span>Soba 311 · Superior</span><span class="mini__cena">3 gosta</span></div>
+              <div class="mini__red mini__red--izabran"><span>Soba 402 · Apartman</span><span class="mini__cena">4 gosta</span></div>
+            </div>
+          </div>
+        </article>
+        <article class="card card--row span-4">
+          <span class="step-num">2</span>
+          <h3>Plati karticom ili u hotelu</h3>
+          <p>Cena za ceo boravak stoji pre potvrde. Od kartice se čuvaju samo poslednje četiri cifre.</p>
+          <div class="panel korak">
+            <div class="mini">
+              <div class="mini__red mini__red--izabran"><span>Kartica •••• 4821</span><span class="mini__cena">odmah</span></div>
+              <div class="mini__red"><span>Gotovina</span><span class="mini__cena">na recepciji</span></div>
+            </div>
+          </div>
+        </article>
+        <article class="card card--row span-4">
+          <span class="step-num">3</span>
+          <h3>Oceni hotel posle boravka</h3>
+          <p>Recenziju piše samo gost koji je boravio u hotelu, ocenom od 1 do 10.</p>
+          <div class="panel korak">
+            <div class="mini">
+              <div class="mini__ocene" aria-hidden="true">
+                @for (n of [6, 7, 8, 9, 10]; track n) {
+                  <span [class.mini__ocena--izabrana]="n === 9">{{ n }}</span>
+                }
+              </div>
+              <div class="mini__red"><span>Tvoja ocena</span><span class="mini__cena">9 od 10</span></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pitanja" aria-labelledby="pitanja-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-5 stack-4">
+          <h2 id="pitanja-h">Pitanja pre rezervacije</h2>
+          <p class="muted">Odgovori važe za svaki hotel na HotelDesku, jer svi rade po istim pravilima rezervacije.</p>
+        </div>
+        <div class="faq span-6 start-7">
+          <div class="faq__item">
+            <h3>Da li mogu da otkažem rezervaciju?</h3>
+            <p>Da, sve dok se ne prijaviš na recepciji. Otkazuješ je sam iz liste svojih rezervacija.</p>
+          </div>
+          <div class="faq__item">
+            <h3>Kako plaćam smeštaj?</h3>
+            <p>Karticom pri rezervaciji ili gotovinom u hotelu. Račun se zatvara pri odjavi.</p>
+          </div>
+          <div class="faq__item">
+            <h3>Treba li mi nalog?</h3>
+            <p>Za pretragu ne. Za rezervaciju treba, a registracija traži ime, email i lozinku od bar 8 znakova.</p>
+          </div>
+          <div class="faq__item">
+            <h3>Ko može da oceni hotel?</h3>
+            <p>Samo gost koji je boravio u hotelu i odjavio se. Svaki boravak dobija jednu recenziju.</p>
+          </div>
+          <div class="faq__item">
+            <h3>Šta ako u sobi nešto ne radi?</h3>
+            <p>Prijavi problem iz aplikacije tokom boravka. Recepcija ga dodeljuje zaposlenom i vidiš kad je rešen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

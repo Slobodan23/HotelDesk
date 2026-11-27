@@ -40,3 +40,10 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+.taste-skill/
+/shots
+/public/credits.html
+/public/assets/img/credits.json
+/public/assets/ui/_lab
+/public/assets/ui/icons/icons-credits.json

@@ -1,125 +1,71 @@
 :host {
   display: block;
+  min-width: 0;
 }
 
 .kartica {
   display: flex;
   flex-direction: column;
+  gap: var(--s-1);
   height: 100%;
-  background: var(--main-svetla);
-  color: var(--second);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--senka);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--u-line, rgba(42, 45, 52, 0.14));
+  border-radius: var(--r-md);
+  background: var(--u-bg, #fff);
+  color: var(--p-ink);
+  text-decoration: none;
 }
 
-.kartica:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 2px 4px rgba(42, 45, 52, 0.08), 0 16px 36px rgba(42, 45, 52, 0.16);
-}
-
-.slika {
-  position: relative;
-  height: 150px;
-  overflow: hidden;
-}
-
-.inicijal {
-  position: absolute;
-  right: -6px;
-  bottom: -36px;
-  font-family: var(--font-naslov);
-  font-size: 150px;
-  font-weight: 700;
-  line-height: 1;
-  color: rgba(236, 235, 230, 0.2);
-}
-
-.grad {
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--main);
-  color: var(--second);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.telo {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 18px 20px 20px;
-}
-
-.zvezdice {
-  color: var(--accent);
-  font-size: 14px;
-  letter-spacing: 2px;
-  height: 20px;
-}
-
-h3 {
-  font-size: 21px;
-  margin-top: 4px;
-}
-
-.adresa {
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: var(--tekst-blag);
-}
-
-.opis {
-  margin: 12px 0 0;
-  font-size: 14px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.dno {
+.red {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--main-linija);
+  gap: var(--s-3);
 }
 
-.telo > :nth-last-child(2) {
-  margin-bottom: 18px;
+.zvezdice {
+  color: var(--p-accent);
+  font-size: 13px;
+  letter-spacing: 2px;
 }
 
 .ocena {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  min-width: 36px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--p-ink);
+  color: var(--p-bg);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
 }
 
-.broj {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--second);
-  color: var(--main);
-  font-weight: 700;
-  font-size: 15px;
+.naziv {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.mesto {
+  font-size: 14px;
+  color: var(--p-muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.dno {
+  margin-top: auto;
+  padding-top: var(--s-3);
+  font-size: 14px;
 }
 
 .opis-ocene {
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--p-muted);
 }
 
 .vise {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent-tamna);
+  color: var(--p-action);
+  font-weight: 500;
 }

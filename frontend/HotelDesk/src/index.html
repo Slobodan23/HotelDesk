@@ -1,14 +1,52 @@
 <!doctype html>
-<html lang="sr">
+<html lang="sr" data-type="software" data-radius="round" data-buttons="arrow" data-motion>
 <head>
   <meta charset="utf-8">
-  <title>HotelDesk</title>
+  <title>HotelDesk: rezervacija hotela u Srbiji i regionu</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Pretraga i rezervacija hotelskih soba u Beogradu, Novom Sadu, Nišu, na Zlatiboru i Kopaoniku, u Budvi, Kotoru i Dubrovniku.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="HotelDesk: rezervacija hotela u Srbiji i regionu">
+  <meta property="og:description" content="Hoteli od Beograda do Dubrovnika, sa plaćanjem karticom ili gotovinom u hotelu.">
+  <meta property="og:image" content="share.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#ecebe6">
+  <meta name="site-kind" content="software">
+  <meta name="page-type" content="software">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,400..600&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/system.css">
+  <link rel="stylesheet" href="assets/ui/cards.css">
+  <link rel="stylesheet" href="assets/motion/motion.css">
+  <link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+  <link rel="stylesheet" href="assets/layout/layout.css">
+  <link rel="stylesheet" href="assets/icons/icon.css">
+  <style>
+    :root {
+      --p-bg: #ecebe6; --p-surface: #e1e0dc; --p-ink: #2a2d34; --p-muted: #5d5f65;
+      --p-accent: #2f5bff; --p-accent-ink: #ffffff; --p-action: #2f5bff; --p-action-ink: #ffffff;
+      --p-inv-bg: #2a2d34; --p-inv-surface: #36383f; --p-inv-ink: #ecebe6; --p-inv-muted: #a2a3a3;
+      --p-inv-accent: #ecebe6; --p-inv-accent-ink: #2a2d34; --p-inv-action: #ecebe6; --p-inv-action-ink: #2a2d34;
+      --font-display: "Mona Sans", system-ui, sans-serif;
+      --font-text: "Mona Sans", system-ui, sans-serif;
+      --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      --display-weight: 500;
+      --display-tracking: -0.03em;
+      --display-tracking-xl: -0.04em;
+      --display-stretch: 104%;
+      --ly-scale: 0.96;
+    }
+  </style>
+  <link rel="stylesheet" href="assets/ui/base.css">
+  <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+  <script src="assets/backgrounds/backgrounds.js"></script>
+  <script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+  <link rel="modulepreload" href="assets/moments/moments.js">
+  <link rel="modulepreload" href="assets/moments/lib.js">
+  <link rel="modulepreload" href="assets/moments/giant-type-pass/moment.js">
 </head>
 <body>
   <app-root></app-root>
