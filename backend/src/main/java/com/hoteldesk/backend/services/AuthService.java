@@ -24,6 +24,7 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         Korisnik korisnik = korisnikRepository.findByEmail(korisnikService.normalizujEmail(request.getEmail()))
+                .filter(k -> !k.isObrisan())
                 .filter(k -> passwordEncoder.matches(request.getPassword(), k.getPassword()))
                 .orElseThrow(() -> new UnauthorizedException("Pogresan email ili lozinka"));
         return new AuthResponse(jwtService.generisiToken(korisnik), KorisnikDTO.from(korisnik));

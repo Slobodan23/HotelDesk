@@ -1,10 +1,13 @@
 package com.hoteldesk.backend.controllers;
 
 import com.hoteldesk.backend.DTO.KorisnikDTO;
+import com.hoteldesk.backend.DTO.KreiranjeKorisnikaRequest;
+import com.hoteldesk.backend.DTO.IzmenaKorisnikaRequest;
 import com.hoteldesk.backend.DTO.PromenaLozinkeRequest;
 import com.hoteldesk.backend.DTO.RegistracijaRequest;
 import com.hoteldesk.backend.security.TrenutniKorisnik;
 import com.hoteldesk.backend.services.KorisnikService;
+import com.hoteldesk.backend.services.UlogaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,7 @@ import java.util.List;
 public class KorisnikController {
 
     private final KorisnikService korisnikService;
+    private final UlogaService ulogaService;
     private final TrenutniKorisnik trenutniKorisnik;
 
     @GetMapping("/me")
@@ -54,5 +58,25 @@ public class KorisnikController {
     @PreAuthorize("hasRole('ADMIN')")
     public KorisnikDTO kreirajVlasnika(@Valid @RequestBody RegistracijaRequest request) {
         return korisnikService.registrujVlasnika(request);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
+    public KorisnikDTO kreiraj(@Valid @RequestBody KreiranjeKorisnikaRequest request) {
+        return ulogaService.kreiraj(request);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public KorisnikDTO izmeni(@PathVariable Long id, @Valid @RequestBody IzmenaKorisnikaRequest request) {
+        return ulogaService.izmeni(id, request, trenutniKorisnik.getId());
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    public void obrisi(@PathVariable Long id) {
+        ulogaService.obrisi(id, trenutniKorisnik.getId());
     }
 }

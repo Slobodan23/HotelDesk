@@ -11,7 +11,7 @@ public interface ZaposleniRepository extends JpaRepository<Zaposleni, Long> {
 
     Optional<Zaposleni> findByEmail(String email);
 
-    List<Zaposleni> findByHotelId(Long hotelId);
+    List<Zaposleni> findByHotelIdAndObrisanFalse(Long hotelId);
 
     List<Zaposleni> findByHotelIdAndTipZaposlenog(Long hotelId, TipZaposlenog tipZaposlenog);
 }

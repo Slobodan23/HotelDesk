@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "korisnici")
@@ -40,4 +43,10 @@ public abstract class Korisnik {
 
     @Enumerated(EnumType.STRING)
     private Pol pol;
+
+    @ColumnDefault("false")
+    @Column(nullable = false)
+    private boolean obrisan;
+
+    private LocalDateTime datumBrisanja;
 }

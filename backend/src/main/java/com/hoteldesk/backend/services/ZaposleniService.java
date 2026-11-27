@@ -4,6 +4,7 @@ import com.hoteldesk.backend.DTO.ZaposleniDTO;
 import com.hoteldesk.backend.exception.BadRequestException;
 import com.hoteldesk.backend.exception.NotFoundException;
 import com.hoteldesk.backend.model.Hotel;
+import com.hoteldesk.backend.model.StatusTiketa;
 import com.hoteldesk.backend.model.Zaposleni;
 import com.hoteldesk.backend.repository.TiketRepository;
 import com.hoteldesk.backend.repository.ZaposleniRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,7 +32,7 @@ public class ZaposleniService {
 
     public List<ZaposleniDTO> findByHotel(Long hotelId, Long korisnikId) {
         hotelService.proveriUpravljanje(hotelService.getHotel(hotelId), korisnikId);
-        return zaposleniRepository.findByHotelId(hotelId).stream().map(ZaposleniDTO::from).toList();
+        return zaposleniRepository.findByHotelIdAndObrisanFalse(hotelId).stream().map(ZaposleniDTO::from).toList();
     }
 
     public ZaposleniDTO getById(Long id, Long korisnikId) {
@@ -82,9 +84,11 @@ public class ZaposleniService {
     public void obrisi(Long id, Long korisnikId) {
         Zaposleni zaposleni = getZaposleni(id);
         hotelService.proveriUpravljanje(zaposleni.getHotel(), korisnikId);
-        tiketRepository.findByDodeljenId(id).forEach(t -> t.setDodeljen(null));
-        zaposleniRepository.delete(zaposleni);
-        zaposleniRepository.flush();
+        tiketRepository.findByDodeljenId(id).stream()
+                .filter(t -> t.getStatus() != StatusTiketa.ZATVOREN)
+                .forEach(t -> t.setDodeljen(null));
+        zaposleni.setObrisan(true);
+        zaposleni.setDatumBrisanja(LocalDateTime.now());
     }
 
     private void popuni(Zaposleni zaposleni, ZaposleniDTO dto) {

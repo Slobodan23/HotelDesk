@@ -1,6 +1,7 @@
 package com.hoteldesk.backend.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -25,7 +24,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final KorisnikJwtConverter korisnikJwtConverter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -49,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(korisnikJwtConverter))
                         .authenticationEntryPoint((req, res, e) ->
                                 posaljiGresku(res, HttpServletResponse.SC_UNAUTHORIZED, "Korisnik nije prijavljen ili je token istekao"))
                         .accessDeniedHandler((req, res, e) ->
@@ -60,16 +62,6 @@ public class SecurityConfig {
                         .accessDeniedHandler((req, res, e) ->
                                 posaljiGresku(res, HttpServletResponse.SC_FORBIDDEN, "Nemate pravo pristupa")));
         return http.build();
-    }
-
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter uloge = new JwtGrantedAuthoritiesConverter();
-        uloge.setAuthoritiesClaimName(JwtService.CLAIM_ULOGA);
-        uloge.setAuthorityPrefix("ROLE_");
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(uloge);
-        return converter;
     }
 
     @Bean

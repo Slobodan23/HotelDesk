@@ -42,7 +42,7 @@ public class KorisnikService {
     }
 
     public List<KorisnikDTO> findAll() {
-        return korisnikRepository.findAll().stream().map(KorisnikDTO::from).toList();
+        return korisnikRepository.findByObrisanFalse().stream().map(KorisnikDTO::from).toList();
     }
 
     public boolean isAdmin(Long korisnikId) {
